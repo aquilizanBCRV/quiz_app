@@ -8,7 +8,7 @@ import java.awt.*;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class AddQuizPanel extends javax.swing.JFrame {
+public class ListOfQuizes extends javax.swing.JFrame {
 
     private static final Color CARD = Color.WHITE;
     private static final Color TEXT = new Color(40, 40, 40);
@@ -24,15 +24,15 @@ public class AddQuizPanel extends javax.swing.JFrame {
         panel.setBackground(CARD);
         panel.setBorder(BorderFactory.createEmptyBorder(40, 40, 40, 40));
 
-        JLabel titleLabel = new JLabel("Quiz Management");
+        JLabel titleLabel = new JLabel("Question Management");
         titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 32));
         titleLabel.setForeground(TEXT);
 
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 15));
         buttonPanel.setOpaque(false);
 
-        buttonPanel.add(createButton("Create Quiz"));
-        buttonPanel.add(createButton("Edit Quiz"));
+        buttonPanel.add(createButton("Create Question"));
+        buttonPanel.add(createButton("Edit Question"));
         buttonPanel.add(createButton("Delete Quiz"));
 
         JPanel header = new JPanel(new BorderLayout());
@@ -78,7 +78,7 @@ public class AddQuizPanel extends javax.swing.JFrame {
 
             }
         } catch (SQLException ex) {
-            System.getLogger(AddQuizPanel.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+            System.getLogger(ListOfQuizes.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
         }
     }
 
@@ -106,7 +106,7 @@ public class AddQuizPanel extends javax.swing.JFrame {
             if (text.equals("Create Quiz")) {
                 addQuiz add = new addQuiz();
                 add.setVisible(true);
-                AddQuizPanel.frame.setVisible(false);
+                ListOfQuizes.frame.setVisible(false);
             } else if (text.equals("Edit Quiz")) {
             } else if (text.equals("Delete Quiz")) {
             }

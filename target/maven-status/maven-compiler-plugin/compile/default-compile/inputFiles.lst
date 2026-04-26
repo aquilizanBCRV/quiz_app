@@ -1,10 +1,11 @@
 /home/yuzuki/NetBeansProjects/Quiz_Application/src/main/java/com/mycompany/quiz_application/App/Login/Auth_Query_Data.java
 /home/yuzuki/NetBeansProjects/Quiz_Application/src/main/java/com/mycompany/quiz_application/App/Login/TeacherDashboard.java
 /home/yuzuki/NetBeansProjects/Quiz_Application/src/main/java/com/mycompany/quiz_application/App/addAccount/ManageAccount_Query_Data.java
-/home/yuzuki/NetBeansProjects/Quiz_Application/src/main/java/com/mycompany/quiz_application/App/mainQuiz/AddQuizPanel.java
-/home/yuzuki/NetBeansProjects/Quiz_Application/src/main/java/com/mycompany/quiz_application/App/mainQuiz/QuizFormPanel.java
+/home/yuzuki/NetBeansProjects/Quiz_Application/src/main/java/com/mycompany/quiz_application/App/mainQuiz/AddQuizGroup.java
+/home/yuzuki/NetBeansProjects/Quiz_Application/src/main/java/com/mycompany/quiz_application/App/mainQuiz/ListOfGroupQuizes.java
+/home/yuzuki/NetBeansProjects/Quiz_Application/src/main/java/com/mycompany/quiz_application/App/mainQuiz/ListOfQuizes.java
+/home/yuzuki/NetBeansProjects/Quiz_Application/src/main/java/com/mycompany/quiz_application/App/mainQuiz/QuizGroup_Query_Data.java
 /home/yuzuki/NetBeansProjects/Quiz_Application/src/main/java/com/mycompany/quiz_application/App/mainQuiz/Quiz_Query_Data.java
-/home/yuzuki/NetBeansProjects/Quiz_Application/src/main/java/com/mycompany/quiz_application/App/mainQuiz/Quizes/QuizGroup_Query_Data.java
 /home/yuzuki/NetBeansProjects/Quiz_Application/src/main/java/com/mycompany/quiz_application/App/mainQuiz/Quizes/QuizLog_Query_Data.java
 /home/yuzuki/NetBeansProjects/Quiz_Application/src/main/java/com/mycompany/quiz_application/App/mainQuiz/Quizes/appQuiz.java
 /home/yuzuki/NetBeansProjects/Quiz_Application/src/main/java/com/mycompany/quiz_application/App/mainQuiz/addQuiz.java

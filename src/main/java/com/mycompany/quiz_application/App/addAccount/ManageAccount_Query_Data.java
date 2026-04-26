@@ -43,10 +43,10 @@ public class ManageAccount_Query_Data {
             prep.setString(6, role);
             prep.execute();
 
-            ResultSet generatedID = prep.getGeneratedKeys();
+            int rowsInserted = prep.executeUpdate();
 
-            if (generatedID.next()) {
-                
+            if (rowsInserted > 0) {
+
             }
         } catch (Exception e) {
         }

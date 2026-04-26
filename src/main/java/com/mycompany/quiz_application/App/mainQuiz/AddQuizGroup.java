@@ -5,7 +5,7 @@ import com.mycompany.quiz_application.dbConnector;
 import javax.swing.*;
 import java.awt.*;
 
-public class QuizFormPanel {
+public class AddQuizGroup {
 
     private static final Color CARD = Color.WHITE;
     private static final Color INPUT = new Color(240, 240, 240);
