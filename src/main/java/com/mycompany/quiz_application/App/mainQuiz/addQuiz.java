@@ -1,6 +1,8 @@
+package com.mycompany.quiz_application.App.mainQuiz;
 
 import com.mycompany.quiz_application.App.Quiz.Quiz;
 import com.mycompany.quiz_application.dbConnector;
+import java.util.ArrayList;
 import javax.swing.JRadioButton;
 import javax.swing.JTextArea;
 
@@ -58,7 +60,7 @@ public class addQuiz extends javax.swing.JFrame {
         buttonGroup1 = new javax.swing.ButtonGroup();
         jLabel1 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTextArea1 = new javax.swing.JTextArea();
+        quizQuestion = new javax.swing.JTextArea();
         jLabel2 = new javax.swing.JLabel();
         jComboBox1 = new javax.swing.JComboBox<>();
         jPanel1 = new javax.swing.JPanel();
@@ -83,9 +85,9 @@ public class addQuiz extends javax.swing.JFrame {
         jLabel1.setFont(new java.awt.Font("Liberation Sans", 0, 24)); // NOI18N
         jLabel1.setText("Questions:");
 
-        jTextArea1.setColumns(20);
-        jTextArea1.setRows(5);
-        jScrollPane1.setViewportView(jTextArea1);
+        quizQuestion.setColumns(20);
+        quizQuestion.setRows(5);
+        jScrollPane1.setViewportView(quizQuestion);
 
         jLabel2.setFont(new java.awt.Font("Liberation Sans", 0, 24)); // NOI18N
         jLabel2.setText("Quiz Type:");
@@ -225,13 +227,18 @@ public class addQuiz extends javax.swing.JFrame {
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
-
         quiz.setQuizGroupID(1);
-        quiz.setQuizName("Sample Quiz");
-        quiz.setQuizType("Tets");
-        quiz.setDisplayQuestion("Test");
-        quiz.setQuestionList(new String[]{"Q1", "Q2"});
-        quiz.setQuizAnswer("Q1");
+        quiz.setQuizType(String.valueOf(jComboBox1.getSelectedIndex()));
+        quiz.setDisplayQuestion(quizQuestion.getText());
+        JTextArea[] textboxes = {Q1_text, Q2_text, Q3_text, Q4_text};
+        ArrayList<String> listAnswer = new ArrayList<>();
+
+        for (JTextArea ta : textboxes) {
+            listAnswer.add(ta.getText());
+        }
+
+        quiz.setQuestionList(listAnswer);
+        quiz.setQuizAnswer(buttonGroup1.getSelection().getActionCommand());
         quiz.createQuiz();
     }//GEN-LAST:event_jButton2ActionPerformed
 
@@ -295,6 +302,6 @@ public class addQuiz extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JScrollPane jScrollPane5;
-    private javax.swing.JTextArea jTextArea1;
+    private javax.swing.JTextArea quizQuestion;
     // End of variables declaration//GEN-END:variables
 }

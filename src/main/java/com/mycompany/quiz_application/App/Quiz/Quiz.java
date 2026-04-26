@@ -23,7 +23,7 @@ public class Quiz extends QuizGroup {
     private int quizGroupID;
     private String quizType;
     private String displayQuestion;
-    private String[] questionList;
+    private ArrayList questionList;
     private String quizAnswer;
 
     public Quiz(dbConnector conn) {
@@ -41,8 +41,6 @@ public class Quiz extends QuizGroup {
         """;
 
         try {
-
-          
             myconn.connect();
             PreparedStatement prep = myconn.con.prepareStatement(selectQuery);
             prep.setInt(1, quizGroupID);
@@ -98,7 +96,7 @@ public class Quiz extends QuizGroup {
         this.displayQuestion = displayQuestion;
     }
 
-    public void setQuestionList(String[] questionList) {
+    public void setQuestionList(ArrayList questionList) {
         this.questionList = questionList;
     }
 

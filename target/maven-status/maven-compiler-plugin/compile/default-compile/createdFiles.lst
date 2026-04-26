@@ -5,11 +5,11 @@ com/mycompany/quiz_application/App/mainQuiz/QuizFormPanel.class
 com/mycompany/quiz_application/App/Quiz/appQuiz$1.class
 com/mycompany/quiz_application/App/Login/Login.class
 com/mycompany/quiz_application/App/Quiz/QuizLog.class
+com/mycompany/quiz_application/App/mainQuiz/addQuiz.class
 com/mycompany/quiz_application/App/Quiz/appQuiz.class
 com/mycompany/quiz_application/dbConnector.class
 com/mycompany/quiz_application/App/addAccount/ManageAccount.class
 com/mycompany/quiz_application/Quiz_Application.class
-addQuiz.class
 com/mycompany/quiz_application/App/mainQuiz/AddQuizPanel$1.class
 com/mycompany/quiz_application/App/mainQuiz/AddQuizPanel.class
 com/mycompany/quiz_application/App/mainQuiz/QuizFormPanel$1.class
