@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.mycompany.quiz_application.App.Quiz;
+package com.mycompany.quiz_application.App.mainQuiz;
 
 import com.mycompany.quiz_application.dbConnector;
 import java.sql.Array;
@@ -17,7 +17,7 @@ import java.util.Map;
  *
  * @author yuzuki
  */
-public class Quiz extends QuizGroup {
+public class Quiz_Query_Data extends QuizGroup_Query_Data {
 
     private dbConnector myconn;
     private int quizGroupID;
@@ -26,7 +26,7 @@ public class Quiz extends QuizGroup {
     private ArrayList questionList;
     private String quizAnswer;
 
-    public Quiz(dbConnector conn) {
+    public Quiz_Query_Data(dbConnector conn) {
         super(conn);
         this.myconn = conn;
     }
@@ -75,15 +75,24 @@ public class Quiz extends QuizGroup {
 
             if (rowsInserted > 0) {
                 System.out.println("Insert successful");
+                quizType = "";
+                displayQuestion = "";
+                questionList = new ArrayList<>();
+                quizAnswer = "";
+                
             } else {
                 System.out.println("Insert failed");
             }
 
         } catch (Exception e) {
-            System.out.println(e);
+            System.err.println(e);
         }
     }
-
+    
+    public ResultSet getDisplayCreatedQuiz() {
+        return null;
+    }
+    
     public void setQuizGroupID(int quizGroupID) {
         this.quizGroupID = quizGroupID;
     }

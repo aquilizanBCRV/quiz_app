@@ -3,10 +3,9 @@
  */
 package com.mycompany.quiz_application;
 
-import com.mycompany.quiz_application.App.Login.Login;
+import com.mycompany.quiz_application.App.Login.Auth_Query_Data;
 
-import com.mycompany.quiz_application.App.addAccount.ManageAccount;
-import com.mycompany.quiz_application.App.Quiz.*;
+import com.mycompany.quiz_application.App.addAccount.ManageAccount_Query_Data;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
@@ -26,15 +25,6 @@ public class Quiz_Application {
 //            System.out.println("User Login Successfully");
 //        }
 
-//        QuizGroup quiz_group = new QuizGroup(conn);
-//
-//        quiz_group.setTeacherID(1);
-//        quiz_group.setQuizName("Science 1");
-//        quiz_group.setHasTime(false);
-//        quiz_group.setTimestamp(null);
-//        quiz_group.setDeadline(LocalDateTime.now().plusDays(3));
-//
-//        quiz_group.creeateQuizGroup();
 
 
 //          QuizLog log = new QuizLog(conn);

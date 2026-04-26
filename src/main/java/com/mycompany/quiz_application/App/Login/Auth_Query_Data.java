@@ -12,13 +12,13 @@ import java.sql.ResultSet;
  *
  * @author yuzuki
  */
-public class Login {
+public class Auth_Query_Data {
     private dbConnector myconn;
     private int userID;
     private String username;
     private String password;
 
-    public Login(dbConnector conn ) {
+    public Auth_Query_Data(dbConnector conn ) {
         this.myconn = conn;
     }
 

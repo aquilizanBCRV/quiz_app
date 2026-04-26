@@ -1,8 +1,8 @@
 package com.mycompany.quiz_application.App.mainQuiz;
 
-import com.mycompany.quiz_application.App.Quiz.Quiz;
 import com.mycompany.quiz_application.dbConnector;
 import java.util.ArrayList;
+import javax.swing.JOptionPane;
 import javax.swing.JRadioButton;
 import javax.swing.JTextArea;
 
@@ -17,34 +17,39 @@ import javax.swing.JTextArea;
 public class addQuiz extends javax.swing.JFrame {
 
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(addQuiz.class.getName());
-    private static Quiz quiz = new Quiz(new dbConnector());
+    private static Quiz_Query_Data quiz = new Quiz_Query_Data(new dbConnector());
 
     /**
      * Creates new form addQuiz
      */
     public addQuiz() {
         initComponents();
-        customeComponents();
         jButtonRadioComponents();
+        customeComponents();
     }
 
     private void customeComponents() {
-        jPanel1.setVisible(false);
-        pack();
-        jPanel1.getParent().revalidate();
-        jPanel1.getParent().repaint();
+        questionerBox.setVisible(false);
+        true_false_Selection.setVisible(false);
+        refreshWindow();
     }
 
     private void jButtonRadioComponents() {
         JRadioButton[] selectionButton = {Q1, Q2, Q3, Q4};
+        JRadioButton[] isTrueorFalse = {trueSelect, falseSelect};
 //        JTextArea[] textboxes = {Q1_text, Q1_text, Q1_text, Q1_text};
         int counter = -1;
         for (JRadioButton selection : selectionButton) {
             buttonGroup1.add(selection);
             counter++;
             selection.setActionCommand(String.valueOf(counter));
-            System.out.println("" + counter);
 //            selection[]
+        }
+        int counter2 = -1;
+        for (JRadioButton selection : isTrueorFalse) {
+            counter2++;
+            buttonGroup2.add(selection);
+            selection.setActionCommand(String.valueOf(counter2));
         }
     }
 
@@ -58,12 +63,13 @@ public class addQuiz extends javax.swing.JFrame {
     private void initComponents() {
 
         buttonGroup1 = new javax.swing.ButtonGroup();
+        buttonGroup2 = new javax.swing.ButtonGroup();
         jLabel1 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         quizQuestion = new javax.swing.JTextArea();
         jLabel2 = new javax.swing.JLabel();
         jComboBox1 = new javax.swing.JComboBox<>();
-        jPanel1 = new javax.swing.JPanel();
+        questionerBox = new javax.swing.JPanel();
         Q1 = new javax.swing.JRadioButton();
         jScrollPane2 = new javax.swing.JScrollPane();
         Q1_text = new javax.swing.JTextArea();
@@ -78,7 +84,9 @@ public class addQuiz extends javax.swing.JFrame {
         Q3 = new javax.swing.JRadioButton();
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
-        filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 32767));
+        true_false_Selection = new javax.swing.JPanel();
+        trueSelect = new javax.swing.JRadioButton();
+        falseSelect = new javax.swing.JRadioButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -120,48 +128,48 @@ public class addQuiz extends javax.swing.JFrame {
 
         Q3.setText("Q3");
 
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
+        javax.swing.GroupLayout questionerBoxLayout = new javax.swing.GroupLayout(questionerBox);
+        questionerBox.setLayout(questionerBoxLayout);
+        questionerBoxLayout.setHorizontalGroup(
+            questionerBoxLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(questionerBoxLayout.createSequentialGroup()
+                .addGroup(questionerBoxLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(questionerBoxLayout.createSequentialGroup()
                         .addComponent(Q4)
                         .addGap(18, 18, 18)
                         .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 597, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
+                    .addGroup(questionerBoxLayout.createSequentialGroup()
                         .addComponent(Q3)
                         .addGap(18, 18, 18)
                         .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 597, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
+                    .addGroup(questionerBoxLayout.createSequentialGroup()
                         .addComponent(Q1)
                         .addGap(18, 18, 18)
                         .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 597, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGap(0, 0, Short.MAX_VALUE))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, questionerBoxLayout.createSequentialGroup()
                 .addComponent(Q2)
                 .addGap(18, 18, 18)
                 .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 597, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
+        questionerBoxLayout.setVerticalGroup(
+            questionerBoxLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(questionerBoxLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(questionerBoxLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(Q1))
                 .addGap(18, 18, 18)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(questionerBoxLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(Q2))
                 .addGap(18, 18, 18)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(questionerBoxLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(Q3))
                 .addGap(18, 18, 18)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(questionerBoxLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(Q4))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -169,10 +177,38 @@ public class addQuiz extends javax.swing.JFrame {
 
         jButton1.setFont(new java.awt.Font("Liberation Sans", 0, 20)); // NOI18N
         jButton1.setText("Cancel");
+        jButton1.addActionListener(this::jButton1ActionPerformed);
 
         jButton2.setFont(new java.awt.Font("Liberation Sans", 0, 20)); // NOI18N
         jButton2.setText("Save");
         jButton2.addActionListener(this::jButton2ActionPerformed);
+
+        trueSelect.setFont(new java.awt.Font("Liberation Sans", 0, 24)); // NOI18N
+        trueSelect.setText("True");
+
+        falseSelect.setFont(new java.awt.Font("Liberation Sans", 0, 24)); // NOI18N
+        falseSelect.setText("False");
+
+        javax.swing.GroupLayout true_false_SelectionLayout = new javax.swing.GroupLayout(true_false_Selection);
+        true_false_Selection.setLayout(true_false_SelectionLayout);
+        true_false_SelectionLayout.setHorizontalGroup(
+            true_false_SelectionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, true_false_SelectionLayout.createSequentialGroup()
+                .addContainerGap(190, Short.MAX_VALUE)
+                .addComponent(trueSelect, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(falseSelect, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(190, Short.MAX_VALUE))
+        );
+        true_false_SelectionLayout.setVerticalGroup(
+            true_false_SelectionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(true_false_SelectionLayout.createSequentialGroup()
+                .addGap(38, 38, 38)
+                .addGroup(true_false_SelectionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(trueSelect)
+                    .addComponent(falseSelect))
+                .addContainerGap(40, Short.MAX_VALUE))
+        );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -188,17 +224,19 @@ public class addQuiz extends javax.swing.JFrame {
                             .addComponent(jComboBox1, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addComponent(jLabel1)
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 688, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                        .addGroup(layout.createSequentialGroup()
-                            .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 153, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGap(37, 37, 37)
-                            .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(14, Short.MAX_VALUE))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(filler1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(306, 306, 306))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(true_false_Selection, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(0, 0, Short.MAX_VALUE))
+                            .addComponent(questionerBox, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addGap(0, 0, Short.MAX_VALUE)
+                                .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 153, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(41, 41, 41)
+                                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(22, 22, 22)))
+                .addGap(14, 14, 14))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -212,48 +250,113 @@ public class addQuiz extends javax.swing.JFrame {
                     .addComponent(jLabel2)
                     .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(28, 28, 28)
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(questionerBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(true_false_Selection, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(filler1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(10, 10, 10))
+                    .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, 65, Short.MAX_VALUE)
+                    .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, 65, Short.MAX_VALUE))
+                .addGap(31, 31, 31))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        // TODO add your handling code here:
+
+        JTextArea[] textboxes = {Q1_text, Q2_text, Q3_text, Q4_text};
+
+        if (!isFormValid(textboxes)) {
+            return;
+        }
+
         quiz.setQuizGroupID(1);
         quiz.setQuizType(String.valueOf(jComboBox1.getSelectedIndex()));
         quiz.setDisplayQuestion(quizQuestion.getText());
-        JTextArea[] textboxes = {Q1_text, Q2_text, Q3_text, Q4_text};
-        ArrayList<String> listAnswer = new ArrayList<>();
 
-        for (JTextArea ta : textboxes) {
-            listAnswer.add(ta.getText());
+        if (jComboBox1.getSelectedIndex() == 1) {
+
+            ArrayList<String> listAnswer = new ArrayList<>();
+            for (JTextArea ta : textboxes) {
+                listAnswer.add(ta.getText());
+            }
+
+            quiz.setQuestionList(listAnswer);
+            quiz.setQuizAnswer(buttonGroup1.getSelection().getActionCommand());
+
+        } else if (jComboBox1.getSelectedIndex() == 2) {
+            quiz.setQuestionList(new ArrayList<>());
+            quiz.setQuizAnswer(buttonGroup2.getSelection().getActionCommand());
+//            System.out.println(buttonGroup2.getSelection().getActionCommand());
         }
-
-        quiz.setQuestionList(listAnswer);
-        quiz.setQuizAnswer(buttonGroup1.getSelection().getActionCommand());
         quiz.createQuiz();
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
         // TODO add your handling code here:
         if (jComboBox1.getSelectedIndex() == 1) {
+            questionerBox.setVisible(true);
+            true_false_Selection.setVisible(false);
+            refreshWindow();
 
-            jPanel1.setVisible(true);
-            pack();
-            jPanel1.getParent().revalidate();
-            jPanel1.getParent().repaint();
+        } else if (jComboBox1.getSelectedIndex() == 2) {
+            true_false_Selection.setVisible(true);
+            questionerBox.setVisible(false);
+            refreshWindow();
         } else {
             customeComponents();
         }
+
     }//GEN-LAST:event_jComboBox1ActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+        AddQuizPanel mainQuiz = new AddQuizPanel();
+        mainQuiz.setVisible(true);
+        setVisible(false);
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private boolean isFormValid(JTextArea[] textboxes) {
+
+        int type = jComboBox1.getSelectedIndex();
+
+        if (type == 0) {
+            JOptionPane.showMessageDialog(this, "Please select a quiz type.");
+            return false;
+        }
+
+        if (quizQuestion.getText().trim().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Question field cannot be empty.");
+            return false;
+        }
+
+        if (type == 1) {
+            for (JTextArea ta : textboxes) {
+                if (ta.getText().trim().isEmpty()) {
+                    JOptionPane.showMessageDialog(this, "All answer fields must be filled.");
+                    return false;
+                }
+            }
+
+            if (buttonGroup1.getSelection() == null) {
+                JOptionPane.showMessageDialog(this, "Please select the correct answer.");
+                return false;
+            }
+
+        } else if (type == 2) {
+            if (buttonGroup2.getSelection() == null) {
+                JOptionPane.showMessageDialog(this, "Please select the correct answer.");
+                return false;
+            }
+        }
+
+        return true; // all conditions passed
+    }
+
+    private void refreshWindow() {
+        pack();
+    }
 
     /**
      * @param args the command line arguments
@@ -290,18 +393,21 @@ public class addQuiz extends javax.swing.JFrame {
     private javax.swing.JRadioButton Q4;
     private javax.swing.JTextArea Q4_text;
     private javax.swing.ButtonGroup buttonGroup1;
-    private javax.swing.Box.Filler filler1;
+    private javax.swing.ButtonGroup buttonGroup2;
+    private javax.swing.JRadioButton falseSelect;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JScrollPane jScrollPane5;
+    private javax.swing.JPanel questionerBox;
     private javax.swing.JTextArea quizQuestion;
+    private javax.swing.JRadioButton trueSelect;
+    private javax.swing.JPanel true_false_Selection;
     // End of variables declaration//GEN-END:variables
 }

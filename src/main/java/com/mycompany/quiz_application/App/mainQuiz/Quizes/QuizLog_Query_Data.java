@@ -2,8 +2,9 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.mycompany.quiz_application.App.Quiz;
+package com.mycompany.quiz_application.App.mainQuiz.Quizes;
 
+import com.mycompany.quiz_application.App.mainQuiz.Quiz_Query_Data;
 import com.mycompany.quiz_application.dbConnector;
 import java.sql.PreparedStatement;
 import java.time.LocalTime;
@@ -12,7 +13,7 @@ import java.time.LocalTime;
  *
  * @author yuzuki
  */
-public class QuizLog extends Quiz {
+public class QuizLog_Query_Data extends Quiz_Query_Data {
 
     private int quizID;
     private int studentID;
@@ -20,7 +21,7 @@ public class QuizLog extends Quiz {
     private LocalTime timestamp;
     private dbConnector myconn;
 
-    public QuizLog(dbConnector conn) {
+    public QuizLog_Query_Data(dbConnector conn) {
         super(conn);
         this.myconn = conn;
     }

@@ -1,6 +1,8 @@
 package com.mycompany.quiz_application.App.Login;
 
-import com.mycompany.quiz_application.App.Quiz.appQuiz;
+import com.mycompany.quiz_application.App.mainQuiz.Quiz_Query_Data;
+import com.mycompany.quiz_application.App.mainQuiz.Quizes.appQuiz;
+//import com.mycompany.quiz_application.App.mainQuiz.Quiz.;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;

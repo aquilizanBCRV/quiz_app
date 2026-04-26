@@ -2,7 +2,8 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.mycompany.quiz_application.App.Quiz;
+
+package com.mycompany.quiz_application.App.mainQuiz;
 
 import com.mycompany.quiz_application.dbConnector;
 import java.sql.PreparedStatement;
@@ -14,7 +15,7 @@ import java.time.LocalTime;
  *
  * @author yuzuki
  */
-public class QuizGroup {
+public class QuizGroup_Query_Data {
 
     private dbConnector myconn;
     
@@ -24,7 +25,7 @@ public class QuizGroup {
     private LocalTime timestamp;
     private LocalDateTime deadline;
 
-    public QuizGroup(dbConnector conn) {
+    public QuizGroup_Query_Data(dbConnector conn) {
         this.myconn = conn;
     }
 

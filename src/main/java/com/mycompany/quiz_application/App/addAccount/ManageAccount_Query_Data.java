@@ -12,7 +12,7 @@ import java.sql.ResultSet;
  *
  * @author yuzuki
  */
-public class ManageAccount {
+public class ManageAccount_Query_Data {
 
     private dbConnector myconn;
 
@@ -23,7 +23,7 @@ public class ManageAccount {
     private String middlename;
     private String role;
 
-    ManageAccount(dbConnector conn) {
+    ManageAccount_Query_Data(dbConnector conn) {
         this.myconn = conn;
     }
 

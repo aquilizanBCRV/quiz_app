@@ -1,15 +1,23 @@
 package com.mycompany.quiz_application.App.mainQuiz;
 
+import com.mycompany.quiz_application.dbConnector;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import java.awt.*;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
-public class AddQuizPanel {
+public class AddQuizPanel extends javax.swing.JFrame {
 
     private static final Color CARD = Color.WHITE;
     private static final Color TEXT = new Color(40, 40, 40);
     private static final Color BG_MAIN = new Color(245, 245, 245);
+
+    public static JFrame frame;
+
+    //eto yung class for create ng query for quizes
+    private static Quiz_Query_Data quiz = new Quiz_Query_Data(new dbConnector());
 
     public static JPanel createPanel() {
         JPanel panel = new JPanel(new BorderLayout(25, 25));
@@ -36,6 +44,7 @@ public class AddQuizPanel {
         DefaultTableModel model = new DefaultTableModel(columns, 0);
 
         JTable table = new JTable(model);
+//        table.setCo
         table.setRowHeight(55);
         table.setFont(new Font("Segoe UI", Font.PLAIN, 18));
         table.setBackground(Color.WHITE);
@@ -50,8 +59,27 @@ public class AddQuizPanel {
 
         panel.add(header, BorderLayout.NORTH);
         panel.add(scroll, BorderLayout.CENTER);
-
+        AddRowData(model);
         return panel;
+    }
+
+    private static void AddRowData(DefaultTableModel model) {
+//model.addRow(new Object[]{1, "Quiz 1"});
+//Pagawa nito code ididisplay lahat nagawang quizes sa "quizes" table
+//lahat ng quizes  under ng quizGroupID, gamit ka lang WHERE clase sa query. 
+//Gamit ka muna ng quizGroupID 1 para madisplay muna
+
+//increment number at "displayQuestion ididisplay sa table. 
+//may code nmn ng select query, yun mo try icopy and icode 
+        ResultSet quizList = quiz.displayQuiz();
+
+        try {
+            while (quizList.next()) {
+
+            }
+        } catch (SQLException ex) {
+            System.getLogger(AddQuizPanel.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+        }
     }
 
     private static JButton createButton(String text) {
@@ -72,19 +100,38 @@ public class AddQuizPanel {
                 btn.setBackground(new Color(30, 30, 30));
             }
         });
+        btn.addActionListener(e -> {
+            System.out.println(text + " button clicked");
 
+            if (text.equals("Create Quiz")) {
+                addQuiz add = new addQuiz();
+                add.setVisible(true);
+                AddQuizPanel.frame.setVisible(false);
+            } else if (text.equals("Edit Quiz")) {
+            } else if (text.equals("Delete Quiz")) {
+            }
+        });
         return btn;
     }
 
     public static void main(String[] args) {
+        setWindow(true);
+    }
+
+    static public void setWindow(boolean show) {
         SwingUtilities.invokeLater(() -> {
-            JFrame frame = new JFrame("Add Quiz Panel");
+            frame = new JFrame("Add Quiz Panel");
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             frame.setSize(1100, 800);
             frame.setLocationRelativeTo(null);
             frame.getContentPane().setBackground(BG_MAIN);
             frame.add(createPanel());
             frame.setVisible(true);
+
         });
+    }
+
+    public void setVisible(boolean show) {
+        setWindow(show);
     }
 }

@@ -1,5 +1,7 @@
 package com.mycompany.quiz_application.App.mainQuiz;
 
+import com.mycompany.quiz_application.App.mainQuiz.Quizes.QuizLog_Query_Data;
+import com.mycompany.quiz_application.dbConnector;
 import javax.swing.*;
 import java.awt.*;
 
@@ -11,7 +13,25 @@ public class QuizFormPanel {
     private static final Color SUBTEXT = new Color(120, 120, 120);
     private static final Color BG_MAIN = new Color(245, 245, 245);
 
+    private static QuizLog_Query_Data quizLog = new QuizLog_Query_Data(new dbConnector());
+    
+    /*
+        Pagawa ng Save button  isavsave yung quizname, set time, and set deadline
+    may na gawa na ako insert query ng quizLog at nawaga na aking code. gawin mo nlang
+    create ka ng click save, then kunin mo yung quizname, set time, and set deadline, wag mo muna pakealaman yung value setTeacherID
+    */
+    
+//        QuizGroup quiz_group = new QuizGroup(conn);
+//
+//        quiz_group.setTeacherID(1);
+//        quiz_group.setQuizName("Science 1");
+//        quiz_group.setHasTime(false); //make it false kapag empty ang Set Time jTextField
+//        quiz_group.setTimestamp(null); //ikaw na dito paano isasave yung set timestamp, kpag empty default as 2 minutes
+//        quiz_group.setDeadline(LocalDateTime.now().plusDays(3));
+//        quiz_group.creeateQuizGroup();
+    
     public static JPanel createPanel() {
+        
         JPanel panel = new JPanel();
         panel.setBackground(CARD);
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
