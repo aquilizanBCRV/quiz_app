@@ -7,6 +7,7 @@ package com.mycompany.quiz_application.App.mainQuiz.Quizes;
 import com.mycompany.quiz_application.App.mainQuiz.Quiz_Query_Data;
 import com.mycompany.quiz_application.dbConnector;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.time.LocalTime;
 
 /**
@@ -20,6 +21,7 @@ public class QuizLog_Query_Data extends Quiz_Query_Data {
     private String studentAnswer;
     private LocalTime timestamp;
     private dbConnector myconn;
+    private int quizGroupID;
 
     public QuizLog_Query_Data(dbConnector conn) {
         super(conn);
@@ -54,6 +56,28 @@ public class QuizLog_Query_Data extends Quiz_Query_Data {
         }
     }
 
+    public ResultSet displayResult() {
+        String selectQuery = """
+       SELECT * FROM quiz_application.answerLog 
+       inner join quizes 
+       ON quizes.quizesID = answerLog.quizID
+        WHERE ;
+        """;
+
+        try {
+            myconn.connect();
+            PreparedStatement prep = myconn.con.prepareStatement(selectQuery);
+            prep.setInt(1, quizGroupID);
+
+            ResultSet rs = prep.executeQuery();
+            return rs;
+
+        } catch (Exception e) {
+            System.out.println(e);
+            return null;
+        }
+    }
+
     public void setQuizID(int quizID) {
         this.quizID = quizID;
     }
@@ -70,4 +94,7 @@ public class QuizLog_Query_Data extends Quiz_Query_Data {
         this.timestamp = timestamp;
     }
 
+    public void setquizGroupID(int quizGroupID) {
+        this.quizGroupID = quizGroupID;
+    }
 }
