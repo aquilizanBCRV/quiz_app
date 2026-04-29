@@ -16,6 +16,7 @@ import java.util.List;
 import javax.swing.AbstractButton;
 import javax.swing.ButtonModel;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.Timer;
@@ -485,9 +486,12 @@ public class appQuiz extends javax.swing.JFrame {
             displayAnswerList(currentIndex);
             getCounter();
         } else {
-            labelDisplayQuiz.setText("End of quiz");
             timer.stop();
             labelTimer.setText("00:00");
+             JOptionPane.showMessageDialog(this, "You finish the quizes. You will redirect to the result...");
+             new QuizResult().setVisible(true);
+             setVisible(false);
+           
         }
     }//GEN-LAST:event_nextPageActionPerformed
     private void displayAnswerList(int currentIndex) {
