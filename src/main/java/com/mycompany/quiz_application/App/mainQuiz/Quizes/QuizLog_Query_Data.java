@@ -61,13 +61,16 @@ public class QuizLog_Query_Data extends Quiz_Query_Data {
        SELECT * FROM quiz_application.answerLog 
        inner join quizes 
        ON quizes.quizesID = answerLog.quizID
-        WHERE quizes.quizGroupID = ?;
+        WHERE quizes.quizGroupID = ?
+        AND answerLog.studentID = ?
+                             ;
         """;
 
         try {
             myconn.connect();
             PreparedStatement prep = myconn.con.prepareStatement(selectQuery);
             prep.setInt(1, quizGroupID);
+            prep.setInt(2, studentID);
             ResultSet rs = prep.executeQuery();
             return rs;
 

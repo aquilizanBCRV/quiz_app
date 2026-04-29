@@ -1,5 +1,6 @@
 package com.mycompany.quiz_application.App.mainQuiz;
 
+import static com.mycompany.quiz_application.App.mainQuiz.ListOfQuizes.setWindow;
 import com.mycompany.quiz_application.App.mainQuiz.Quizes.QuizLog_Query_Data;
 import com.mycompany.quiz_application.dbConnector;
 import javax.swing.*;
@@ -14,13 +15,14 @@ public class AddQuizGroup {
     private static final Color BG_MAIN = new Color(245, 245, 245);
 
     private static QuizLog_Query_Data quizLog = new QuizLog_Query_Data(new dbConnector());
-    
-        /*
+
+    private static JFrame frame;
+
+    /*
         Pagawa ng Save button  isavsave yung quizname, set time, and set deadline
     may na gawa na ako insert query ng quizLog at nawaga na aking code. gawin mo nlang
     create ka ng click save, then kunin mo yung quizname, set time, and set deadline, wag mo muna pakealaman yung value setTeacherID
-    */
-    
+     */
 //        QuizGroup quiz_group = new QuizGroup(conn);
 //
 //        quiz_group.setTeacherID(1);
@@ -29,7 +31,6 @@ public class AddQuizGroup {
 //        quiz_group.setTimestamp(null); //ikaw na dito paano isasave yung set timestamp, kpag empty default as 2 minutes
 //        quiz_group.setDeadline(LocalDateTime.now().plusDays(3));
 //        quiz_group.creeateQuizGroup();
-
     public static JPanel createPanel() {
 
         JPanel panel = new JPanel();
@@ -148,14 +149,22 @@ public class AddQuizGroup {
     }
 
     public static void main(String[] args) {
+        setWindow(true);
+    }
+
+    public static void setWindow(boolean show) {
         SwingUtilities.invokeLater(() -> {
-            JFrame frame = new JFrame("Quiz Form Panel");
+            frame = new JFrame("Quiz Form Panel");
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             frame.setSize(1100, 800);
             frame.setLocationRelativeTo(null);
             frame.getContentPane().setBackground(BG_MAIN);
             frame.add(createPanel());
-            frame.setVisible(true);
+            frame.setVisible(show);
         });
+    }
+
+    public void setVisible(boolean show) {
+        setWindow(show);
     }
 }
