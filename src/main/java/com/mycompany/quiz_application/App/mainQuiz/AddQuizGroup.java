@@ -15,7 +15,7 @@ public class AddQuizGroup {
 
     private static QuizLog_Query_Data quizLog = new QuizLog_Query_Data(new dbConnector());
     
-    /*
+        /*
         Pagawa ng Save button  isavsave yung quizname, set time, and set deadline
     may na gawa na ako insert query ng quizLog at nawaga na aking code. gawin mo nlang
     create ka ng click save, then kunin mo yung quizname, set time, and set deadline, wag mo muna pakealaman yung value setTeacherID
@@ -29,9 +29,9 @@ public class AddQuizGroup {
 //        quiz_group.setTimestamp(null); //ikaw na dito paano isasave yung set timestamp, kpag empty default as 2 minutes
 //        quiz_group.setDeadline(LocalDateTime.now().plusDays(3));
 //        quiz_group.creeateQuizGroup();
-    
+
     public static JPanel createPanel() {
-        
+
         JPanel panel = new JPanel();
         panel.setBackground(CARD);
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
@@ -41,20 +41,63 @@ public class AddQuizGroup {
         panel.add(Box.createVerticalStrut(30));
 
         panel.add(createLabel("Quiz Name"));
-        panel.add(createInput());
+        JTextField quizNameField = createInput();
+        panel.add(quizNameField);
 
         panel.add(Box.createVerticalStrut(25));
 
-        panel.add(createLabel("Set Time (minutes)"));
-        panel.add(createInput());
+        
+        //for timer
+        JCheckBox enableTimer = new JCheckBox("Enable Timer");
+        enableTimer.setFont(new Font("Segoe UI", Font.PLAIN, 16));
+        enableTimer.setBackground(CARD);
+        panel.add(enableTimer);
 
-        panel.add(Box.createVerticalStrut(35));
+        panel.add(Box.createVerticalStrut(10));
+
+        //timer textfield
+        JTextField timerField = createInput();
+        timerField.setVisible(false);
+        panel.add(timerField);
+
+        panel.add(Box.createVerticalStrut(25));
 
         panel.add(createLabel("Set Deadline"));
-        panel.add(createInput());
+        JTextField deadlineField = createInput();
+        panel.add(deadlineField);
 
         panel.add(Box.createVerticalStrut(40));
-        panel.add(createButton("Save"));
+
+        JButton saveBtn = createButton("Save");
+        panel.add(saveBtn);
+
+        //logic
+        enableTimer.addActionListener(e -> {
+            timerField.setVisible(enableTimer.isSelected());
+            panel.revalidate();
+            panel.repaint();
+        });
+
+        //save button
+        saveBtn.addActionListener(e -> {
+            String quizName = quizNameField.getText();
+            String timerText = timerField.getText();
+            String deadlineText = deadlineField.getText();
+
+            boolean hasTime = enableTimer.isSelected();
+
+            if (quizName.isEmpty()) {
+                JOptionPane.showMessageDialog(panel, "Quiz Name is required!");
+                return;
+            }
+
+            System.out.println("Quiz Name: " + quizName);
+            System.out.println("Has Timer: " + hasTime);
+            System.out.println("Timer Value: " + timerText);
+            System.out.println("Deadline: " + deadlineText);
+
+            JOptionPane.showMessageDialog(panel, "Saved successfully!");
+        });
 
         return panel;
     }
@@ -84,6 +127,7 @@ public class AddQuizGroup {
 
     private static JButton createButton(String text) {
         JButton btn = new JButton(text);
+        btn.setAlignmentX(Component.LEFT_ALIGNMENT); // ALIGN FIX
         btn.setBackground(new Color(30, 30, 30));
         btn.setForeground(Color.WHITE);
         btn.setFont(new Font("Segoe UI", Font.BOLD, 18));
