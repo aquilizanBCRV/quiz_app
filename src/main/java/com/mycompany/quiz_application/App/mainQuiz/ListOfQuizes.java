@@ -1,5 +1,6 @@
 package com.mycompany.quiz_application.App.mainQuiz;
 
+import com.mycompany.quiz_application.Globals;
 import com.mycompany.quiz_application.dbConnector;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -13,8 +14,10 @@ public class ListOfQuizes extends javax.swing.JFrame {
     private static final Color CARD = Color.WHITE;
     private static final Color TEXT = new Color(40, 40, 40);
     private static final Color BG_MAIN = new Color(245, 245, 245);
-
+    static int id = 0;
     public static JFrame frame;
+    private static JTable table;
+    private static DefaultTableModel model;
 
     //eto yung class for create ng query for quizes
     private static Quiz_Query_Data quiz = new Quiz_Query_Data(new dbConnector());
@@ -33,17 +36,17 @@ public class ListOfQuizes extends javax.swing.JFrame {
 
         buttonPanel.add(createButton("Create Question"));
         buttonPanel.add(createButton("Edit Question"));
-        buttonPanel.add(createButton("Delete Quiz"));
+        buttonPanel.add(createButton("Delete Question"));
 
         JPanel header = new JPanel(new BorderLayout());
         header.setOpaque(false);
         header.add(titleLabel, BorderLayout.NORTH);
         header.add(buttonPanel, BorderLayout.SOUTH);
 
-        String[] columns = {"No.", "Quiz Name"};
-        DefaultTableModel model = new DefaultTableModel(columns, 0);
+        String[] columns = {"No.", "#", "Quiz Questions"};
+        model = new DefaultTableModel(columns, 0);
 
-        JTable table = new JTable(model);
+        table = new JTable(model);
 //        table.setCo
         table.setRowHeight(55);
         table.setFont(new Font("Segoe UI", Font.PLAIN, 18));
@@ -60,25 +63,47 @@ public class ListOfQuizes extends javax.swing.JFrame {
         panel.add(header, BorderLayout.NORTH);
         panel.add(scroll, BorderLayout.CENTER);
         AddRowData(model);
+
+        table.getColumnModel().getColumn(1).setMaxWidth(40);
+        table.getColumnModel().getColumn(0).setMinWidth(0);
+        table.getColumnModel().getColumn(0).setMaxWidth(0);
+        table.getColumnModel().getColumn(0).setWidth(0);
+
+        table.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                int row = table.getSelectedRow();
+
+                if (row != -1) {
+                    id = (int) table.getModel().getValueAt(row, 0);
+                    System.out.println("Selected ID: " + id);
+                }
+            }
+        });
         return panel;
     }
 
-    private static void AddRowData(DefaultTableModel model) {
-//model.addRow(new Object[]{1, "Quiz 1"});
-//Pagawa nito code ididisplay lahat nagawang quizes sa "quizes" table
-//lahat ng quizes  under ng quizGroupID, gamit ka lang WHERE clase sa query. 
-//Gamit ka muna ng quizGroupID 1 para madisplay muna
+    private static void refreshTable() {
+        model.setRowCount(0);
+        AddRowData(model);
+    }
 
-//increment number at "displayQuestion ididisplay sa table. 
-//may code nmn ng select query, yun mo try icopy and icode 
-        ResultSet quizList = quiz.displayQuiz();
+    private static void AddRowData(DefaultTableModel model) {
+        quiz.setQuizGroupID(Globals.getInstance().getQuizGroupID());
+        ResultSet quizList = quiz.displayQuiz("");
+        int counter = 0;
 
         try {
             while (quizList.next()) {
-
+                ++counter;
+                model.addRow(new Object[]{
+                    quizList.getInt("quizesID"), // hidden ID
+                    counter,
+                    quizList.getString("displayQuestion")
+                });
             }
         } catch (SQLException ex) {
-            System.getLogger(ListOfQuizes.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+            System.getLogger(ListOfQuizes.class.getName())
+                    .log(System.Logger.Level.ERROR, (String) null, ex);
         }
     }
 
@@ -103,12 +128,32 @@ public class ListOfQuizes extends javax.swing.JFrame {
         btn.addActionListener(e -> {
             System.out.println(text + " button clicked");
 
-            if (text.equals("Create Quiz")) {
+            if (text.equals("Create Question")) {
                 addQuiz add = new addQuiz();
                 add.setVisible(true);
                 ListOfQuizes.frame.setVisible(false);
-            } else if (text.equals("Edit Quiz")) {
-            } else if (text.equals("Delete Quiz")) {
+            } else if (text.equals("Edit Question")) {
+                Globals.getInstance().setQueryMode("edit");
+                Globals.getInstance().setQuizID(id);
+                addQuiz add = new addQuiz();
+                add.setVisible(true);
+                ListOfQuizes.frame.setVisible(false);
+
+            } else if (text.equals("Delete Question")) {
+                int choice = JOptionPane.showConfirmDialog(
+                        null,
+                        "Do you want to delete this?",
+                        "Confirm Delete",
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.WARNING_MESSAGE
+                );
+
+                if (choice == JOptionPane.YES_OPTION) {
+                    JOptionPane.showMessageDialog(frame, "You Successfully delete ID.%d".formatted(id));
+                    quiz.setQuizID(id);
+                    quiz.DeleteQuery();
+                    refreshTable();
+                }
             }
         });
         return btn;

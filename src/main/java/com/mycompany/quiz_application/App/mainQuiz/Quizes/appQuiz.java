@@ -4,6 +4,7 @@
  */
 package com.mycompany.quiz_application.App.mainQuiz.Quizes;
 
+import com.mycompany.quiz_application.Globals;
 import com.mycompany.quiz_application.App.mainQuiz.Quiz_Query_Data;
 import com.mycompany.quiz_application.dbConnector;
 import java.awt.event.ActionEvent;
@@ -29,7 +30,7 @@ import javax.swing.text.View;
 public class appQuiz extends javax.swing.JFrame {
 
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(appQuiz.class.getName());
-
+//    static Globals global = new Globals(); 
     static dbConnector conn = new dbConnector();
     static QuizLog_Query_Data log = new QuizLog_Query_Data(conn);
     private Timer timer;
@@ -60,7 +61,7 @@ public class appQuiz extends javax.swing.JFrame {
     private void initializeQuiz() {
         Quiz_Query_Data quiz = new Quiz_Query_Data(conn);
         quiz.setQuizGroupID(1);
-        ResultSet quizList = quiz.displayQuiz();
+        ResultSet quizList = quiz.displayQuiz("");
 
         try {
             while (quizList.next()) {
@@ -89,9 +90,9 @@ public class appQuiz extends javax.swing.JFrame {
         buttonGroup1.add(selection_2);
         buttonGroup1.add(selection_4);
         buttonGroup1.add(selection_6);
-        
-       buttonGroup2.add(falseSelect);
-       buttonGroup2.add(trueSelect);
+
+        buttonGroup2.add(falseSelect);
+        buttonGroup2.add(trueSelect);
 
         // Stop existing timer if running
         if (timer != null && timer.isRunning()) {
@@ -488,10 +489,14 @@ public class appQuiz extends javax.swing.JFrame {
         } else {
             timer.stop();
             labelTimer.setText("00:00");
-             JOptionPane.showMessageDialog(this, "You finish the quizes. You will redirect to the result...");
-             new QuizResult().setVisible(true);
-             setVisible(false);
-           
+            JOptionPane.showMessageDialog(this, "You finish the quizes. You will redirect to the result...");
+            QuizResult qr = new QuizResult();
+            Globals.getInstance().setStudentID(1);
+            Globals.getInstance().setQuizGroupID(1);
+            qr.showResult();
+            setVisible(false);
+            qr.setVisible(true);
+
         }
     }//GEN-LAST:event_nextPageActionPerformed
     private void displayAnswerList(int currentIndex) {

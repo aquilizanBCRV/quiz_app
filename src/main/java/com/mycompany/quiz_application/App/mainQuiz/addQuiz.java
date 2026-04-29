@@ -1,6 +1,9 @@
 package com.mycompany.quiz_application.App.mainQuiz;
 
+import static com.mycompany.quiz_application.App.mainQuiz.ListOfQuizes.id;
+import com.mycompany.quiz_application.Globals;
 import com.mycompany.quiz_application.dbConnector;
+import java.sql.ResultSet;
 import java.util.ArrayList;
 import javax.swing.JOptionPane;
 import javax.swing.JRadioButton;
@@ -26,12 +29,82 @@ public class addQuiz extends javax.swing.JFrame {
         initComponents();
         jButtonRadioComponents();
         customeComponents();
+        editQuery();
     }
 
     private void customeComponents() {
+        clearFields.setVisible(true);
         questionerBox.setVisible(false);
         true_false_Selection.setVisible(false);
         refreshWindow();
+    }
+
+    public void editQuery() {
+
+        if (Globals.getInstance().getQueryMode().equals("edit")) {
+            clearFields.setVisible(false);
+            try {
+                quiz.setQuizID(Globals.getInstance().getQuizID());
+                System.err.println(Globals.getInstance().getQuizID());
+                ResultSet set = quiz.displaySpecifyQuiz();
+                while (set.next()) {
+                    quizQuestion.setText(set.getString("displayQuestion"));
+                    jComboBox1.setSelectedIndex(set.getInt("quizType"));
+                    if (set.getInt("quizType") == 1) {
+
+                        questionerBox.setVisible(true);
+                        true_false_Selection.setVisible(false);
+                        refreshWindow();
+                        JTextArea[] textboxes = {Q1_text, Q2_text, Q3_text, Q4_text};
+                        JRadioButton[] selectionButton = {Q1, Q2, Q3, Q4};
+//                        System.out.println(set.getString("displayQuestion"));
+                        String[] array = set.getString("questionList").split(",");
+                        int count = -1;
+                        for (JTextArea ta : textboxes) {
+                            ++count;
+                            ta.setText(array[count]);
+                        }
+                        selectionButton[set.getInt("quizAnswer")].setSelected(true);
+                    } else if (set.getInt("quizType") == 2) {
+
+                        questionerBox.setVisible(false);
+                        true_false_Selection.setVisible(true);
+                        JRadioButton[] truefalseSelection = {trueSelect, falseSelect};
+                        System.out.println(set.getInt("quizType"));
+                        truefalseSelection[set.getInt("quizAnswer")].setSelected(true);
+                    }
+
+                }
+            } catch (Exception e) {
+            }
+        }
+    }
+
+    public void clearInputs() {
+        // Clear question text
+        quizQuestion.setText("");
+
+        // Clear text areas
+        JTextArea[] textboxes = {Q1_text, Q2_text, Q3_text, Q4_text};
+        for (JTextArea ta : textboxes) {
+            ta.setText("");
+        }
+
+        // Clear radio button selection
+        JRadioButton[] selectionButton = {Q1, Q2, Q3, Q4};
+
+        for (JRadioButton rb : selectionButton) {
+            rb.setSelected(false);
+        }
+
+        // Optional: hide panels if needed
+        questionerBox.setVisible(false);
+        true_false_Selection.setVisible(false);
+
+        Globals.getInstance().setQueryMode("");
+        Globals.getInstance().setQuizID(0);
+        jComboBox1.setSelectedIndex(0);
+        System.out.println("The Fields is cleared");
     }
 
     private void jButtonRadioComponents() {
@@ -87,6 +160,7 @@ public class addQuiz extends javax.swing.JFrame {
         true_false_Selection = new javax.swing.JPanel();
         trueSelect = new javax.swing.JRadioButton();
         falseSelect = new javax.swing.JRadioButton();
+        clearFields = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -210,6 +284,9 @@ public class addQuiz extends javax.swing.JFrame {
                 .addContainerGap(40, Short.MAX_VALUE))
         );
 
+        clearFields.setText("Clear");
+        clearFields.addActionListener(this::clearFieldsActionPerformed);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -231,7 +308,8 @@ public class addQuiz extends javax.swing.JFrame {
                                 .addGap(0, 0, Short.MAX_VALUE))
                             .addComponent(questionerBox, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addGap(0, 0, Short.MAX_VALUE)
+                                .addComponent(clearFields, javax.swing.GroupLayout.PREFERRED_SIZE, 143, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 153, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(41, 41, 41)
                                 .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)))
@@ -256,7 +334,8 @@ public class addQuiz extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, 65, Short.MAX_VALUE)
-                    .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, 65, Short.MAX_VALUE))
+                    .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, 65, Short.MAX_VALUE)
+                    .addComponent(clearFields, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(31, 31, 31))
         );
 
@@ -290,7 +369,24 @@ public class addQuiz extends javax.swing.JFrame {
             quiz.setQuizAnswer(buttonGroup2.getSelection().getActionCommand());
 //            System.out.println(buttonGroup2.getSelection().getActionCommand());
         }
-        quiz.createQuiz();
+
+        if (Globals.getInstance().getQueryMode().equals("edit")) {
+            JOptionPane.showMessageDialog(this, "Successfuly update a quiz");
+
+            quiz.setQuizID(Globals.getInstance().getQuizID());
+            quiz.updateQuiz();
+
+            clearInputs();
+            ListOfQuizes mainQuiz = new ListOfQuizes();
+            mainQuiz.setVisible(true);
+            setVisible(false);
+
+        } else {
+            JOptionPane.showMessageDialog(this, "Successfuly add a new quiz");
+
+            quiz.createQuiz();
+        }
+        clearInputs();
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
@@ -312,10 +408,17 @@ public class addQuiz extends javax.swing.JFrame {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
+
+        clearInputs();
         ListOfQuizes mainQuiz = new ListOfQuizes();
         mainQuiz.setVisible(true);
         setVisible(false);
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void clearFieldsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clearFieldsActionPerformed
+        // TODO add your handling code here:
+        clearInputs();
+    }//GEN-LAST:event_clearFieldsActionPerformed
 
     private boolean isFormValid(JTextArea[] textboxes) {
 
@@ -394,6 +497,7 @@ public class addQuiz extends javax.swing.JFrame {
     private javax.swing.JTextArea Q4_text;
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.ButtonGroup buttonGroup2;
+    private javax.swing.JButton clearFields;
     private javax.swing.JRadioButton falseSelect;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;

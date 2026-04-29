@@ -1,5 +1,7 @@
 package com.mycompany.quiz_application.App.mainQuiz;
 
+import static com.mycompany.quiz_application.App.mainQuiz.ListOfQuizes.id;
+import com.mycompany.quiz_application.Globals;
 import com.mycompany.quiz_application.dbConnector;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -17,7 +19,7 @@ public class ListOfGroupQuizes extends javax.swing.JFrame {
     public static JFrame frame;
 
     //eto yung class for create ng query for quizes
-    private static Quiz_Query_Data quiz = new Quiz_Query_Data(new dbConnector());
+    private static QuizGroup_Query_Data quiz = new QuizGroup_Query_Data(new dbConnector());
 
     public static JPanel createPanel() {
         JPanel panel = new JPanel(new BorderLayout(25, 25));
@@ -31,6 +33,7 @@ public class ListOfGroupQuizes extends javax.swing.JFrame {
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 15));
         buttonPanel.setOpaque(false);
 
+        buttonPanel.add(createButton("Open Quiz"));
         buttonPanel.add(createButton("Add Quiz"));
         buttonPanel.add(createButton("Edit Quiz"));
         buttonPanel.add(createButton("Delete Quiz"));
@@ -40,7 +43,7 @@ public class ListOfGroupQuizes extends javax.swing.JFrame {
         header.add(titleLabel, BorderLayout.NORTH);
         header.add(buttonPanel, BorderLayout.SOUTH);
 
-        String[] columns = {"No.", "Quiz Name"};
+        String[] columns = {"No.", "#", "Quiz Questions", "Teachers"};
         DefaultTableModel model = new DefaultTableModel(columns, 0);
 
         JTable table = new JTable(model);
@@ -60,25 +63,42 @@ public class ListOfGroupQuizes extends javax.swing.JFrame {
         panel.add(header, BorderLayout.NORTH);
         panel.add(scroll, BorderLayout.CENTER);
         AddRowData(model);
+
+        table.getColumnModel().getColumn(1).setMaxWidth(40);
+        table.getColumnModel().getColumn(0).setMinWidth(0);
+        table.getColumnModel().getColumn(0).setMaxWidth(0);
+        table.getColumnModel().getColumn(0).setWidth(0);
+
+        table.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                int row = table.getSelectedRow();
+
+                if (row != -1) {
+                    id = (int) table.getModel().getValueAt(row, 0);
+                    System.out.println("Selected ID: " + id);
+                }
+            }
+        });
         return panel;
     }
 
     private static void AddRowData(DefaultTableModel model) {
-//model.addRow(new Object[]{1, "Quiz 1"});
-//Pagawa nito code ididisplay lahat nagawang quizes sa "quizes" table
-//lahat ng quizes  under ng quizGroupID, gamit ka lang WHERE clase sa query. 
-//Gamit ka muna ng quizGroupID 1 para madisplay muna
-
-//increment number at "displayQuestion ididisplay sa table. 
-//may code nmn ng select query, yun mo try icopy and icode 
         ResultSet quizList = quiz.displayQuiz();
+        int counter = 0;
 
         try {
             while (quizList.next()) {
-
+                ++counter;
+                model.addRow(new Object[]{
+                    quizList.getInt("quizGroupID"), // hidden ID
+                    counter,
+                    quizList.getString("quizName"),
+                    quizList.getString("fullname")
+                });
             }
         } catch (SQLException ex) {
-            System.getLogger(ListOfGroupQuizes.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+            System.getLogger(ListOfQuizes.class.getName())
+                    .log(System.Logger.Level.ERROR, (String) null, ex);
         }
     }
 
@@ -103,14 +123,24 @@ public class ListOfGroupQuizes extends javax.swing.JFrame {
         btn.addActionListener(e -> {
             System.out.println(text + " button clicked");
 
-//            if (text.equals("Create Quiz")) {
-//                addQuiz add = new addQuiz();
-//                add.setVisible(true);
-//                ListOfGroupQuizes.frame.setVisible(false);
-//            } else if (text.equals("Edit Quiz")) {
+            if (text.equals("Open Quiz")) {
+
+                Globals.getInstance().setQuizGroupID(id);
+                ListOfQuizes mainQuiz = new ListOfQuizes();
+                mainQuiz.setVisible(true);
+                ListOfGroupQuizes.frame.setVisible(false);
+
+//                
+            } else if (text.equals("Add Quiz")) {
+                AddQuizGroup addgroup = new AddQuizGroup();
+                addgroup.setVisible(true);
+                ListOfGroupQuizes.frame.setVisible(false);
+
+            }
 //            } else if (text.equals("Delete Quiz")) {
 //            }
-        });
+        }
+        );
         return btn;
     }
 

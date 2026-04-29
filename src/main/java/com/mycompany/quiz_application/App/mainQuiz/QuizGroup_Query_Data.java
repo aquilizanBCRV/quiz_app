@@ -64,6 +64,33 @@ public class QuizGroup_Query_Data {
         }
     }
 
+    public ResultSet displayQuiz() {
+        String selectQuery = """
+SELECT 
+          *,
+          CONCAT_WS(' ', firstname, middleName, lastname) AS fullname
+      FROM quizGroup q
+      JOIN quiz_application.Teacher t 
+          ON q.teacherID = t.teacherID
+      JOIN accountUser u 
+          ON t.userID = u.userID
+        """;
+
+        try {
+            myconn.connect();
+            PreparedStatement prep = myconn.con.prepareStatement(selectQuery);
+//            prep.setInt(1, 1);
+
+            ResultSet rs = prep.executeQuery();
+            return rs;
+
+        } catch (Exception e) {
+            System.out.println(e);
+            return null;
+        }
+
+    }
+
     public void setTeacherID(int teacherID) {
         this.teacherID = teacherID;
     }

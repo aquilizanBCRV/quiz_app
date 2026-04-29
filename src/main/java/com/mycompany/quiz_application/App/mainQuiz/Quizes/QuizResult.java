@@ -4,6 +4,7 @@
  */
 package com.mycompany.quiz_application.App.mainQuiz.Quizes;
 
+import com.mycompany.quiz_application.Globals;
 import com.mycompany.quiz_application.dbConnector;
 import java.sql.ResultSet;
 
@@ -17,19 +18,30 @@ public class QuizResult extends javax.swing.JFrame {
 
     static QuizLog_Query_Data log = new QuizLog_Query_Data(new dbConnector());
 
+    public void setStudentID(int studentID) {
+        this.studentID = studentID;
+    }
+
+    public void setQuizGroupID(int quizGroupID) {
+        this.quizGroupID = quizGroupID;
+    }
+
+    private int studentID;
+    private int quizGroupID;
     /**
      * Creates new form QuizResult
      */
     public QuizResult() {
         initComponents();
-        showResult();
     }
 
     public void showResult() {
         int totalNumber = 0;
         int resultNumber = 0;
         try {
-            log.setquizGroupID(1);
+            System.out.println(studentID+" "+quizGroupID);
+            log.setquizGroupID(  Globals.getInstance().getQuizGroupID());
+            log.setStudentID( Globals.getInstance().getStudentID());
             ResultSet quizList = log.displayResult();
 
             while (quizList.next()) {
