@@ -1,6 +1,8 @@
 package com.mycompany.quiz_application.App.mainQuiz;
 
+import static com.mycompany.quiz_application.App.mainQuiz.ListOfQuizes.frame;
 import static com.mycompany.quiz_application.App.mainQuiz.ListOfQuizes.id;
+import com.mycompany.quiz_application.App.mainQuiz.Quizes.appQuiz;
 import com.mycompany.quiz_application.Globals;
 import com.mycompany.quiz_application.dbConnector;
 import javax.swing.*;
@@ -16,6 +18,7 @@ public class ListOfGroupQuizes extends javax.swing.JFrame {
     private static final Color TEXT = new Color(40, 40, 40);
     private static final Color BG_MAIN = new Color(245, 245, 245);
 
+    private static DefaultTableModel model;
     public static JFrame frame;
 
     //eto yung class for create ng query for quizes
@@ -33,6 +36,7 @@ public class ListOfGroupQuizes extends javax.swing.JFrame {
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 15));
         buttonPanel.setOpaque(false);
 
+        buttonPanel.add(createButton("Start Quiz"));
         buttonPanel.add(createButton("Open Quiz"));
         buttonPanel.add(createButton("Add Quiz"));
         buttonPanel.add(createButton("Edit Quiz"));
@@ -44,7 +48,7 @@ public class ListOfGroupQuizes extends javax.swing.JFrame {
         header.add(buttonPanel, BorderLayout.SOUTH);
 
         String[] columns = {"No.", "#", "Quiz Questions", "Teachers"};
-        DefaultTableModel model = new DefaultTableModel(columns, 0);
+        model = new DefaultTableModel(columns, 0);
 
         JTable table = new JTable(model);
 //        table.setCo
@@ -75,7 +79,7 @@ public class ListOfGroupQuizes extends javax.swing.JFrame {
 
                 if (row != -1) {
                     id = (int) table.getModel().getValueAt(row, 0);
-                    System.out.println("Selected ID: " + id);
+                    System.out.println(id);
                 }
             }
         });
@@ -102,6 +106,11 @@ public class ListOfGroupQuizes extends javax.swing.JFrame {
         }
     }
 
+    private static void refreshTable() {
+        model.setRowCount(0);
+        AddRowData(model);
+    }
+
     private static JButton createButton(String text) {
         JButton btn = new JButton(text);
         btn.setBackground(new Color(30, 30, 30));
@@ -121,6 +130,10 @@ public class ListOfGroupQuizes extends javax.swing.JFrame {
             }
         });
         btn.addActionListener(e -> {
+            if (id == 0 && !text.equals("Add Quiz")) {
+                JOptionPane.showMessageDialog(frame, "No selected Rows");
+                return;
+            }
             System.out.println(text + " button clicked");
 
             if (text.equals("Open Quiz")) {
@@ -129,16 +142,50 @@ public class ListOfGroupQuizes extends javax.swing.JFrame {
                 ListOfQuizes mainQuiz = new ListOfQuizes();
                 mainQuiz.setVisible(true);
                 ListOfGroupQuizes.frame.setVisible(false);
+                id = 0;
 
-//                
+            } else if (text.equals("Start Quiz")) {
+                Globals.getInstance().setStudentID(1);
+                Globals.getInstance().setQuizGroupID(id);
+                appQuiz quizes = new appQuiz();
+                quizes.setVisible(true);
+
+                ListOfGroupQuizes.frame.setVisible(false);
             } else if (text.equals("Add Quiz")) {
                 AddQuizGroup addgroup = new AddQuizGroup();
                 addgroup.setVisible(true);
                 ListOfGroupQuizes.frame.setVisible(false);
 
+                id = 0;
+
+            } else if (text.equals("Edit Quiz")) {
+
+                Globals.getInstance().setQueryMode("edit");
+                Globals.getInstance().setQuizGroupID(id);
+
+                AddQuizGroup addgroup = new AddQuizGroup();
+                addgroup.setVisible(true);
+                ListOfGroupQuizes.frame.setVisible(false);
+                id = 0;
+
+            } else if (text.equals("Delete Quiz")) {
+
+                int choice = JOptionPane.showConfirmDialog(
+                        null,
+                        "Do you want to delete this?",
+                        "Confirm Delete",
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.WARNING_MESSAGE
+                );
+
+                if (choice == JOptionPane.YES_OPTION) {
+                    JOptionPane.showMessageDialog(frame, "You Successfully delete ID.%d".formatted(id));
+                    quiz.setQuizGroupID(id);
+                    quiz.deleteQuizGroup();
+                    refreshTable();
+
+                }
             }
-//            } else if (text.equals("Delete Quiz")) {
-//            }
         }
         );
         return btn;

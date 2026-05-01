@@ -4,6 +4,7 @@
  */
 package com.mycompany.quiz_application.App.mainQuiz.Quizes;
 
+import com.mycompany.quiz_application.App.mainQuiz.ListOfGroupQuizes;
 import com.mycompany.quiz_application.Globals;
 import com.mycompany.quiz_application.dbConnector;
 import java.sql.ResultSet;
@@ -118,6 +119,7 @@ public class QuizResult extends javax.swing.JFrame {
         jLabel5.setText("Congrats completing Quiz");
 
         jButton1.setText("Done");
+        jButton1.addActionListener(this::jButton1ActionPerformed);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -157,6 +159,13 @@ public class QuizResult extends javax.swing.JFrame {
         pack();
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+       
+        ListOfGroupQuizes group = new ListOfGroupQuizes();
+        setVisible(false);
+        group.setVisible(true);
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * @param args the command line arguments

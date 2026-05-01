@@ -38,6 +38,7 @@ public class ListOfQuizes extends javax.swing.JFrame {
         buttonPanel.add(createButton("Edit Question"));
         buttonPanel.add(createButton("Delete Question"));
 
+        buttonPanel.add(createButton("Back"));
         JPanel header = new JPanel(new BorderLayout());
         header.setOpaque(false);
         header.add(titleLabel, BorderLayout.NORTH);
@@ -154,6 +155,11 @@ public class ListOfQuizes extends javax.swing.JFrame {
                     quiz.DeleteQuery();
                     refreshTable();
                 }
+            } else if (text.equals("Back")) {
+
+                ListOfGroupQuizes add = new ListOfGroupQuizes();
+                add.setVisible(true);
+                ListOfQuizes.frame.setVisible(false);
             }
         });
         return btn;

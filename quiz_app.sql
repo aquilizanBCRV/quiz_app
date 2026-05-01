@@ -1,3 +1,5 @@
+CREATE DATABASE  IF NOT EXISTS `quiz_application` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
+USE `quiz_application`;
 -- MySQL dump 10.13  Distrib 8.0.45, for Linux (x86_64)
 --
 -- Host: localhost    Database: quiz_application
@@ -50,7 +52,7 @@ CREATE TABLE `Teacher` (
   `teacherID` int NOT NULL AUTO_INCREMENT,
   `userID` int DEFAULT NULL,
   PRIMARY KEY (`teacherID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -59,6 +61,7 @@ CREATE TABLE `Teacher` (
 
 LOCK TABLES `Teacher` WRITE;
 /*!40000 ALTER TABLE `Teacher` DISABLE KEYS */;
+INSERT INTO `Teacher` VALUES (1,2);
 /*!40000 ALTER TABLE `Teacher` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -79,7 +82,7 @@ CREATE TABLE `accountUser` (
   `roles` varchar(10) NOT NULL,
   PRIMARY KEY (`userID`),
   UNIQUE KEY `username_UNIQUE` (`username`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -88,7 +91,7 @@ CREATE TABLE `accountUser` (
 
 LOCK TABLES `accountUser` WRITE;
 /*!40000 ALTER TABLE `accountUser` DISABLE KEYS */;
-INSERT INTO `accountUser` VALUES (1,'Vince2026','rendervoid2026','Vince Michael','Belangel',NULL,'Admin');
+INSERT INTO `accountUser` VALUES (1,'Vince2026','rendervoid2026','Vince Michael','Belangel',NULL,'Admin'),(2,'yuzuki','teacher12','Yuzuki','Kouta',NULL,'Teacher');
 /*!40000 ALTER TABLE `accountUser` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -106,7 +109,7 @@ CREATE TABLE `answerLog` (
   `studentAnswer` varchar(45) DEFAULT NULL,
   `timestamp` time DEFAULT NULL,
   PRIMARY KEY (`logID`)
-) ENGINE=InnoDB AUTO_INCREMENT=40 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=96 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -115,8 +118,37 @@ CREATE TABLE `answerLog` (
 
 LOCK TABLES `answerLog` WRITE;
 /*!40000 ALTER TABLE `answerLog` DISABLE KEYS */;
-INSERT INTO `answerLog` VALUES (33,6,1,'1','00:00:03'),(34,8,1,'2','00:00:02'),(35,9,1,'2','00:00:02'),(36,11,1,'0','00:00:03'),(37,12,1,'1','00:00:22'),(38,11,1,'0','00:00:04'),(39,12,1,'1','00:00:02');
+INSERT INTO `answerLog` VALUES (94,26,1,'0','00:00:03'),(95,26,1,'0','00:00:02');
 /*!40000 ALTER TABLE `answerLog` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `progress`
+--
+
+DROP TABLE IF EXISTS `progress`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `progress` (
+  `progressID` int NOT NULL AUTO_INCREMENT,
+  `studentID` int NOT NULL,
+  `quizGroupID` int NOT NULL,
+  `quizCounter` int NOT NULL,
+  `currentTimestamp` time DEFAULT NULL,
+  `status` varchar(20) NOT NULL,
+  PRIMARY KEY (`progressID`),
+  UNIQUE KEY `studentID_UNIQUE` (`studentID`)
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `progress`
+--
+
+LOCK TABLES `progress` WRITE;
+/*!40000 ALTER TABLE `progress` DISABLE KEYS */;
+INSERT INTO `progress` VALUES (9,1,8,1,'00:00:12','saved');
+/*!40000 ALTER TABLE `progress` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -131,10 +163,10 @@ CREATE TABLE `quizGroup` (
   `teacherID` int DEFAULT NULL,
   `quizName` varchar(100) DEFAULT NULL,
   `hasTime` tinyint DEFAULT NULL,
-  `timestamp` datetime DEFAULT NULL,
-  `deadline` varchar(45) DEFAULT NULL,
+  `timestamp` int DEFAULT NULL,
+  `deadline` date DEFAULT NULL,
   PRIMARY KEY (`quizGroupID`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -143,7 +175,7 @@ CREATE TABLE `quizGroup` (
 
 LOCK TABLES `quizGroup` WRITE;
 /*!40000 ALTER TABLE `quizGroup` DISABLE KEYS */;
-INSERT INTO `quizGroup` VALUES (1,1,'Science 1',0,NULL,'2026-04-27 22:19:17.098711');
+INSERT INTO `quizGroup` VALUES (8,1,'Java II',1,2,'2026-05-01');
 /*!40000 ALTER TABLE `quizGroup` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -162,7 +194,7 @@ CREATE TABLE `quizes` (
   `questionList` longtext,
   `quizAnswer` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`quizesID`)
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=29 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -171,7 +203,7 @@ CREATE TABLE `quizes` (
 
 LOCK TABLES `quizes` WRITE;
 /*!40000 ALTER TABLE `quizes` DISABLE KEYS */;
-INSERT INTO `quizes` VALUES (11,1,'2','Hello','','0'),(12,1,'2','Hello?','','1');
+INSERT INTO `quizes` VALUES (15,1,'1','What is Capital of Manila?','Tokyo,Seoul,Manila,Wasington','2'),(20,1,'2','Is true that Java is founded by Ryan Goshling?','','1'),(21,1,'2','Is true that CPU is made of metal?','','1'),(25,2,'2','hello','','0'),(26,8,'2','is Java is a programming langugaes?','','0'),(28,8,'2','Lalalla','','1');
 /*!40000 ALTER TABLE `quizes` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -184,4 +216,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-04-27  0:38:46
+-- Dump completed on 2026-05-01 12:43:04

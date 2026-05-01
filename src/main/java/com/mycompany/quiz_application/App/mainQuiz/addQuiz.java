@@ -40,7 +40,6 @@ public class addQuiz extends javax.swing.JFrame {
     }
 
     public void editQuery() {
-
         if (Globals.getInstance().getQueryMode().equals("edit")) {
             clearFields.setVisible(false);
             try {
@@ -350,7 +349,7 @@ public class addQuiz extends javax.swing.JFrame {
             return;
         }
 
-        quiz.setQuizGroupID(1);
+        quiz.setQuizGroupID(Globals.getInstance().getQuizGroupID());
         quiz.setQuizType(String.valueOf(jComboBox1.getSelectedIndex()));
         quiz.setDisplayQuestion(quizQuestion.getText());
 

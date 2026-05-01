@@ -12,7 +12,7 @@ public class dbConnector {
 	
 	private String url = "jdbc:mysql://localhost:3306/quiz_application";
 	private String username = "root";
-	private String password = "Gahatameiji12";
+	private String password = "";
 	
 	public Connection con;
 	

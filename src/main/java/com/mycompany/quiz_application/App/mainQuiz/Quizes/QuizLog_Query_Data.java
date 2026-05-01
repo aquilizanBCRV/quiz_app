@@ -22,10 +22,81 @@ public class QuizLog_Query_Data extends Quiz_Query_Data {
     private LocalTime timestamp;
     private dbConnector myconn;
     private int quizGroupID;
+    private int counter;
+    private String status;
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public void setCounter(int counter) {
+        this.counter = counter;
+    }
 
     public QuizLog_Query_Data(dbConnector conn) {
         super(conn);
         this.myconn = conn;
+    }
+
+    public void saveProgress() {
+        String sql = """
+    INSERT INTO progress (
+        studentID,
+        quizGroupID,
+        quizCounter,
+        currentTimestamp,
+        status
+    )
+    VALUES (
+        ?,
+        ?,
+        ?,
+        ?,
+        ?
+    )
+    ON DUPLICATE KEY UPDATE
+        quizCounter = VALUES(quizCounter),
+        currentTimestamp = VALUES(currentTimestamp),
+        status = VALUES(status);
+    """;
+
+        try (PreparedStatement ps = myconn.con.prepareStatement(sql)) {
+
+            ps.setInt(1, studentID);
+            ps.setInt(2, quizGroupID);
+            ps.setInt(3, counter);
+
+            // Use Timestamp instead of Time
+            ps.setTime(4, java.sql.Time.valueOf(timestamp));
+            ps.setString(5, status);
+
+            ps.executeUpdate();
+
+        } catch (Exception e) {
+            System.err.println(e);
+        }
+    }
+
+    public ResultSet setProgress() {
+        String selectQuery = """
+       SELECT * FROM progress
+        WHERE studentID = ?
+        AND quizGroupID = ?
+                             ;
+        """;
+
+        try {
+            myconn.connect();
+            PreparedStatement prep = myconn.con.prepareStatement(selectQuery);
+            prep.setInt(1, studentID);
+            prep.setInt(2, quizGroupID);
+            ResultSet rs = prep.executeQuery();
+            return rs;
+
+        } catch (Exception e) {
+            System.out.println(e);
+            return null;
+        }
     }
 
     public void createQuiz() {
