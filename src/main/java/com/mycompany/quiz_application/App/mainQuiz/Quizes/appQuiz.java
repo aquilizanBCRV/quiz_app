@@ -64,7 +64,7 @@ public class appQuiz extends javax.swing.JFrame {
 
         quiz.setQuizGroupID(Globals.getInstance().getQuizGroupID());
 
-        ResultSet quizList = quiz.displayQuiz("");
+        ResultSet quizList = quiz.displayQuiz();
 
         try {
             while (quizList.next()) {
@@ -79,17 +79,25 @@ public class appQuiz extends javax.swing.JFrame {
             // Show first quizlog.setStudentID(Globals.getInstance().getStudentID());
             log.setquizGroupID(Globals.getInstance().getQuizGroupID());
 
+            log.setStudentID(Globals.getInstance().getStudentID());
             ResultSet savedProgress = log.setProgress();
 
             if (savedProgress != null && savedProgress.next()) {
-
+                System.out.println("Progessed Detected");
                 // Has at least one row
                 int setPage = savedProgress.getInt("quizCounter");
                 Time setTime = savedProgress.getTime("currentTimestamp");
                 int minute = setTime.toLocalTime().getMinute();
+
                 labelDisplayQuiz.setText(quizQuestions.get(setPage));
                 displayAnswerList(setPage);
-                counter = minute;
+                currentIndex = setPage;
+                LocalTime savedTime = setTime.toLocalTime();
+
+                counter
+                        = savedTime.getHour() * 3600
+                        + savedTime.getMinute() * 60
+                        + savedTime.getSecond();
                 getCounter();
 
             } else {
@@ -97,6 +105,7 @@ public class appQuiz extends javax.swing.JFrame {
                 if (!quizQuestions.isEmpty()) {
                     labelDisplayQuiz.setText(quizQuestions.get(currentIndex));
                     displayAnswerList(currentIndex);
+
                     getCounter();
                 }
 
@@ -122,8 +131,6 @@ public class appQuiz extends javax.swing.JFrame {
         }
 
         // Reset counter
-        counter = 0;
-
         // Create new timer
         timer = new Timer(1000, new ActionListener() { // 1000ms = 1 second
             @Override
@@ -519,16 +526,14 @@ public class appQuiz extends javax.swing.JFrame {
         if (currentIndex < quizQuestions.size() - 1) {
             currentIndex++;
             labelDisplayQuiz.setText(quizQuestions.get(currentIndex));
-            restartTimer();
             displayAnswerList(currentIndex);
             getCounter();
+            restartTimer();
         } else {
             timer.stop();
             labelTimer.setText("00:00");
             JOptionPane.showMessageDialog(this, "You finish the quizes. You will redirect to the result...");
             QuizResult qr = new QuizResult();
-            Globals.getInstance().setStudentID(1);
-            Globals.getInstance().setQuizGroupID(1);
             qr.showResult();
             saveProgress("done");
             setVisible(false);

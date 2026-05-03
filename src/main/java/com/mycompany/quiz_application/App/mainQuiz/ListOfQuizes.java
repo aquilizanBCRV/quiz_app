@@ -90,18 +90,29 @@ public class ListOfQuizes extends javax.swing.JFrame {
 
     private static void AddRowData(DefaultTableModel model) {
         quiz.setQuizGroupID(Globals.getInstance().getQuizGroupID());
-        ResultSet quizList = quiz.displayQuiz("");
+        ResultSet quizList = quiz.displayQuiz();
         int counter = 0;
 
         try {
-            while (quizList.next()) {
+
+            // Check if empty
+            if (!quizList.next()) {
+                System.out.println("No data found.");
+                return; // stop method
+            }
+
+            // Process first row + remaining rows
+            do {
                 ++counter;
+
                 model.addRow(new Object[]{
-                    quizList.getInt("quizesID"), // hidden ID
+                    quizList.getInt("quizesID"),
                     counter,
                     quizList.getString("displayQuestion")
                 });
-            }
+
+            } while (quizList.next());
+
         } catch (SQLException ex) {
             System.getLogger(ListOfQuizes.class.getName())
                     .log(System.Logger.Level.ERROR, (String) null, ex);

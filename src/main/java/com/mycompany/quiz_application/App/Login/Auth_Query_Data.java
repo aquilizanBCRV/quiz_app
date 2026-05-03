@@ -13,19 +13,60 @@ import java.sql.ResultSet;
  * @author yuzuki
  */
 public class Auth_Query_Data {
+
     private dbConnector myconn;
     private int userID;
     private String username;
     private String password;
+    private String roles;
 
-    public Auth_Query_Data(dbConnector conn ) {
+    public void setRoles(String roles) {
+        this.roles = roles;
+    }
+
+    public Auth_Query_Data(dbConnector conn) {
         this.myconn = conn;
     }
 
-    public boolean checkLogin() {
+    public ResultSet getInfo() {
+        try {
+
+            String tableName = "";
+
+            if (roles.equals("Student")) {
+                tableName = "Student";
+            } else if (roles.equals("Teacher")) {
+                tableName = "Teacher";
+            } else {
+                throw new IllegalArgumentException("Invalid role");
+            }
+
+           String loginQuery = """
+        SELECT *
+        FROM %s
+        INNER JOIN accountUser
+            ON accountUser.userID = %s.userID
+        WHERE accountUser.userID = ?
+        """.formatted(tableName, tableName);
+
+            myconn.connect();
+
+            PreparedStatement prep = myconn.con.prepareStatement(loginQuery);
+
+            prep.setInt(1, userID);
+
+            return prep.executeQuery();
+
+        } catch (Exception e) {
+            System.out.println(e);
+            return null;
+        }
+    }
+
+    public ResultSet checkLogin() {
         try {
             String loginQuery = """
-                            SELECT username, password, userID from accountUser
+                            SELECT * from accountUser
                             WHERE username = ?
                             AND password = ?
                             LIMIT 1
@@ -37,19 +78,14 @@ public class Auth_Query_Data {
             prep.setString(2, password);
 
             ResultSet result = prep.executeQuery();
-            if(result.next()) {
-                this.userID = result.getInt("userID");
-                return true;
-            }
-            else {
-                return false;
-            }
-        } catch (Exception e) {   
+
+            return result;
+        } catch (Exception e) {
             System.out.println(e);
-                return false;
+            return null;
         }
     }
-    
+
     //USERNAME
     public String getUsername() {
         return username;
@@ -67,7 +103,11 @@ public class Auth_Query_Data {
     public void setPassword(String password) {
         this.password = password;
     }
-    
+
+    public void setUserID(int userID) {
+        this.userID = userID;
+    }
+
     public int getUserID() {
         return userID;
     }

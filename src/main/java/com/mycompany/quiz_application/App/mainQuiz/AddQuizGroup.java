@@ -167,27 +167,82 @@ public class AddQuizGroup {
 
             if (text.equals("Save")) {
 
-                int setTimerLabel = Integer.parseInt(timerText);
+                // Get latest values
+                quizName = quizNameField.getText().trim();
+                timerText = timerField.getText().trim();
+                hasTime = enableTimer.isSelected();
+
+                // Deadline value
+                Date selectedDate = dateChooser.getDate();
+
+                if (selectedDate != null) {
+                    deadlineValue = selectedDate.toInstant()
+                            .atZone(ZoneId.systemDefault())
+                            .toLocalDateTime();
+                } else {
+                    deadlineValue = null;
+                }
+
+                if (quizName.isEmpty()) {
+                    JOptionPane.showMessageDialog(panel, "Quiz Name is required!");
+                    return;
+                }
+
+                if (deadlineValue == null) {
+                    JOptionPane.showMessageDialog(panel, "Deadline is required!");
+                    return;
+                }
+
+                if (hasTime) {
+
+                    if (timerText.isEmpty()) {
+                        JOptionPane.showMessageDialog(panel, "Timer is required!");
+                        return;
+                    }
+
+                    try {
+
+                        int setTimerLabel = Integer.parseInt(timerText);
+
+                        if (setTimerLabel <= 0) {
+                            JOptionPane.showMessageDialog(panel, "Timer must be greater than 0!");
+                            return;
+                        }
+
+                        quizLog.setTimestamp(setTimerLabel);
+
+                    } catch (NumberFormatException ex) {
+
+                        JOptionPane.showMessageDialog(panel, "Timer must be a valid number!");
+                        return;
+                    }
+
+                } else {
+
+                    quizLog.setTimestamp(0);
+                }
 
                 quizLog.setQuizName(quizName);
                 quizLog.setHasTime(hasTime);
-                quizLog.setTimestamp(setTimerLabel);
                 quizLog.setDeadline(deadlineValue);
-                quizLog.setTeacherID(1);
+                quizLog.setTeacherID(Globals.getInstance().getTeacherID());
 
                 if (Globals.getInstance().getQueryMode().equals("edit")) {
 
                     quizLog.setQuizGroupID(Globals.getInstance().getQuizGroupID());
                     quizLog.updateQuizGroup();
+
                 } else {
 
                     quizLog.createQuizGroup();
                 }
+
+                JOptionPane.showMessageDialog(panel, "Saved successfully!");
             }
 
             ListOfGroupQuizes listGroup = new ListOfGroupQuizes();
-            listGroup.setVisible(true);
-            AddQuizGroup.frame.setVisible(false);
+            listGroup.setWindow(true);
+            frame.setVisible(false);
 //            } else if (text.equals("Delete Quiz")) {
 //            }
         }
@@ -212,7 +267,6 @@ public class AddQuizGroup {
             panel.revalidate();
             panel.repaint();
             try {
-                System.err.println("Display Edit");
                 quizLog.setQuizGroupID(Globals.getInstance().getQuizGroupID());
                 System.out.println("AddQuiz, " + Globals.getInstance().getQuizGroupID());
                 ResultSet set = quizLog.getQuizGroup();
@@ -222,7 +276,7 @@ public class AddQuizGroup {
                     quizNameField.setText(set.getString("quizName"));
                     enableTimer.setSelected(set.getBoolean("hasTime"));
                     if (set.getBoolean("hasTime")) {
-
+                        timerField.setVisible(set.getBoolean("hasTime"));
                         timerField.setText(String.valueOf(set.getInt("timestamp")));
 //                      
                     }

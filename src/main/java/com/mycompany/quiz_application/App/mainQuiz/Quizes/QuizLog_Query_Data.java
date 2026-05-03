@@ -82,7 +82,7 @@ public class QuizLog_Query_Data extends Quiz_Query_Data {
        SELECT * FROM progress
         WHERE studentID = ?
         AND quizGroupID = ?
-                             ;
+                         ;
         """;
 
         try {
@@ -90,6 +90,8 @@ public class QuizLog_Query_Data extends Quiz_Query_Data {
             PreparedStatement prep = myconn.con.prepareStatement(selectQuery);
             prep.setInt(1, studentID);
             prep.setInt(2, quizGroupID);
+            System.out.println(quizGroupID);
+            System.out.println(studentID);
             ResultSet rs = prep.executeQuery();
             return rs;
 

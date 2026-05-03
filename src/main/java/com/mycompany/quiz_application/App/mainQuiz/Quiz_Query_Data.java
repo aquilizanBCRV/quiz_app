@@ -17,7 +17,7 @@ import java.util.Map;
  *
  * @author yuzuki
  */
-public class Quiz_Query_Data extends QuizGroup_Query_Data {
+public class Quiz_Query_Data  {
 
     private dbConnector myconn;
     private int quizID;
@@ -28,7 +28,6 @@ public class Quiz_Query_Data extends QuizGroup_Query_Data {
     private String quizAnswer;
 
     public Quiz_Query_Data(dbConnector conn) {
-        super(conn);
         this.myconn = conn;
     }
 
@@ -77,12 +76,9 @@ public class Quiz_Query_Data extends QuizGroup_Query_Data {
 
     }
 
-    public ResultSet displayQuiz(String q) {
+    public ResultSet displayQuiz() {
         String selectQuery = """
-        SELECT * FROM quiz_application.quizes 
-        INNER JOIN quizGroup 
-        ON quizes.quizGroupID = quizGroup.quizGroupID
-        WHERE quizGroup.quizGroupID = ?;
+        SELECT * FROM quiz_application.quizes WHERE quizGroupID = ?
         """;
 
         try {

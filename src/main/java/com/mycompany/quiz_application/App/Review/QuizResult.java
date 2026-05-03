@@ -2,8 +2,9 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
-package com.mycompany.quiz_application.App.mainQuiz.Quizes;
+package com.mycompany.quiz_application.App.Review;
 
+import com.mycompany.quiz_application.App.mainQuiz.Quizes.*;
 import com.mycompany.quiz_application.App.mainQuiz.ListOfGroupQuizes;
 import com.mycompany.quiz_application.Globals;
 import com.mycompany.quiz_application.dbConnector;
@@ -19,16 +20,6 @@ public class QuizResult extends javax.swing.JFrame {
 
     static QuizLog_Query_Data log = new QuizLog_Query_Data(new dbConnector());
 
-    public void setStudentID(int studentID) {
-        this.studentID = studentID;
-    }
-
-    public void setQuizGroupID(int quizGroupID) {
-        this.quizGroupID = quizGroupID;
-    }
-
-    private int studentID;
-    private int quizGroupID;
     /**
      * Creates new form QuizResult
      */
@@ -40,9 +31,9 @@ public class QuizResult extends javax.swing.JFrame {
         int totalNumber = 0;
         int resultNumber = 0;
         try {
-            System.out.println(studentID+" "+quizGroupID);
-            log.setquizGroupID(  Globals.getInstance().getQuizGroupID());
-            log.setStudentID( Globals.getInstance().getStudentID());
+            log.setquizGroupID(Globals.getInstance().getQuizGroupID());
+            log.setStudentID(Globals.getInstance().getStudentID());
+            
             ResultSet quizList = log.displayResult();
 
             while (quizList.next()) {
@@ -162,9 +153,9 @@ public class QuizResult extends javax.swing.JFrame {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
        
-        ListOfGroupQuizes group = new ListOfGroupQuizes();
+        finishedQuiz group = new finishedQuiz();
         setVisible(false);
-        group.setWindow(true);
+        group.setVisible(true);
     }//GEN-LAST:event_jButton1ActionPerformed
 
     /**

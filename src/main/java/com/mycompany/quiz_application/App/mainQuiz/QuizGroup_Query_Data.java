@@ -3,191 +3,159 @@ package com.mycompany.quiz_application.App.mainQuiz;
 import com.mycompany.quiz_application.dbConnector;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Types;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 public class QuizGroup_Query_Data {
 
-    private dbConnector myconn;
+    private final dbConnector myconn;
+
+    // Fields
     private int quizGroupID;
     private int teacherID;
     private String quizName;
     private boolean hasTime;
     private int timestamp;
+    private int studentID;
     private LocalDateTime deadline;
+    private String roles;
 
     public QuizGroup_Query_Data(dbConnector conn) {
-        this.myconn = conn;
+        this.myconn = Objects.requireNonNull(conn, "Connector cannot be null");
     }
 
+    // ====================== CRUD Operations ======================
+
     public void createQuizGroup() {
-        String insertQuery = """
-                             INSERT INTO quizGroup
-                             (teacherID, quizName, hasTime, timestamp, deadline)
-                             VALUES(?,?,?,?,?)
-                             """;
+        String sql = """
+            INSERT INTO quizGroup (teacherID, quizName, hasTime, timestamp, deadline)
+            VALUES (?, ?, ?, ?, ?)
+            """;
 
         try {
             myconn.connect();
-
-            try (PreparedStatement prep = myconn.con.prepareStatement(insertQuery)) {
-
+            try (PreparedStatement prep = myconn.con.prepareStatement(sql)) {
                 prep.setInt(1, teacherID);
                 prep.setString(2, quizName);
                 prep.setBoolean(3, hasTime);
                 prep.setInt(4, timestamp);
+                setDateOrNull(prep, 5, deadline);
 
-                if (deadline != null) {
-                    prep.setDate(5, java.sql.Date.valueOf(deadline.toLocalDate()));
-                } else {
-                    prep.setNull(5, java.sql.Types.DATE);
-                }
-
-                int rowsInserted = prep.executeUpdate();
-
-                if (rowsInserted > 0) {
-                    System.out.println("Insert successful");
-                } else {
-                    System.out.println("Insert failed");
-                }
+                int rows = prep.executeUpdate();
+                System.out.println(rows > 0 ? "Quiz group created successfully" : "Failed to create quiz group");
             }
-
         } catch (Exception e) {
-            System.out.println(e);
+            e.printStackTrace();
         }
     }
 
     public void updateQuizGroup() {
-        String updateQuery = """
-                         UPDATE quizGroup
-                         SET teacherID = ?, 
-                             quizName = ?, 
-                             hasTime = ?, 
-                             timestamp = ?, 
-                             deadline = ?
-                         WHERE quizGroupID = ?
-                         """;
+        String sql = """
+            UPDATE quizGroup
+            SET teacherID = ?, 
+                quizName = ?, 
+                hasTime = ?, 
+                timestamp = ?, 
+                deadline = ?
+            WHERE quizGroupID = ?
+            """;
 
         try {
             myconn.connect();
-
-            try (PreparedStatement prep = myconn.con.prepareStatement(updateQuery)) {
-
+            try (PreparedStatement prep = myconn.con.prepareStatement(sql)) {
                 prep.setInt(1, teacherID);
                 prep.setString(2, quizName);
                 prep.setBoolean(3, hasTime);
-
-             
                 prep.setInt(4, timestamp);
-
-                if (deadline != null) {
-                    prep.setDate(5, java.sql.Date.valueOf(deadline.toLocalDate()));
-                } else {
-                    prep.setNull(5, java.sql.Types.DATE);
-                }
-
-                // WHERE condition parameter
+                setDateOrNull(prep, 5, deadline);
                 prep.setInt(6, quizGroupID);
 
-                int rowsUpdated = prep.executeUpdate();
-
-                if (rowsUpdated > 0) {
-                    System.out.println("Update successful");
-                } else {
-                    System.out.println("No record updated");
-                }
+                int rows = prep.executeUpdate();
+                System.out.println(rows > 0 ? "Quiz group updated successfully" : "No record updated");
             }
-
         } catch (Exception e) {
-            System.out.println(e);
+            e.printStackTrace();
         }
     }
 
     public void deleteQuizGroup() {
-        String deleteQuery = """
-                     DELETE FROM quizGroup WHERE quizGroupID = ?;
-                     """;
-        try {
-            myconn.connect();
-            PreparedStatement prep = myconn.con.prepareStatement(deleteQuery);
-
-            prep.setInt(1, quizGroupID);
-
-            int rowsInserted = prep.executeUpdate();
-
-            if (rowsInserted > 0) {
-                System.out.println("Delete successful");
-
-            } else {
-                System.out.println("Delete failed");
-            }
-
-        } catch (Exception e) {
-            System.err.println(e);
-        }
+        myconn.executeUpdate("DELETE FROM quizGroup WHERE quizGroupID = ?", 
+                            new Object[]{quizGroupID});
     }
 
     public ResultSet getQuizGroup() {
-        String selectQuery = """
-            SELECT *
-            FROM quizGroup 
-            WHERE quizGroupID = ?
-        """;
-
-        try {
-            myconn.connect();
-            PreparedStatement prep = myconn.con.prepareStatement(selectQuery);
-            System.out.println("QUiz Group Query, " + quizGroupID);
-            prep.setInt(1, quizGroupID);
-            return prep.executeQuery();
-
-        } catch (Exception e) {
-            System.out.println(e);
-            return null;
-        }
+        return myconn.readQuery("""
+            SELECT * FROM quizGroup WHERE quizGroupID = ?
+            """, new Object[]{quizGroupID});
     }
+
+    public void publish() {
+        myconn.executeUpdate("""
+            UPDATE quizGroup SET published = 1 WHERE quizGroupID = ?
+            """, new Object[]{quizGroupID});
+    }
+
+    // ====================== Display / Query ======================
 
     public ResultSet displayQuiz() {
-        String selectQuery = """
+        String baseQuery = """
             SELECT *,
-            CONCAT_WS(' ', firstname, middleName, lastname) AS fullname
-            FROM quizGroup q
-            JOIN quiz_application.Teacher t ON q.teacherID = t.teacherID
-            JOIN accountUser u ON t.userID = u.userID
-        """;
+                   CONCAT_WS(' ', u.firstname, u.middleName, u.lastname) AS fullname
+            FROM accountUser u
+            """;
 
-        try {
-            myconn.connect();
-            PreparedStatement prep = myconn.con.prepareStatement(selectQuery);
-            return prep.executeQuery();
+        Object[] params;
+        String extraQuery;
 
-        } catch (Exception e) {
-            System.out.println(e);
+        if ("Student".equals(roles)) {
+            extraQuery = """
+                JOIN Teacher t ON t.userID = u.userID 
+                JOIN quizGroup qg ON t.teacherID = qg.teacherID
+                LEFT JOIN progress p ON p.quizGroupID = qg.quizGroupID  
+                WHERE (p.progressID IS NULL OR p.status != 'done')
+                  AND p.studentID = ?
+                """;
+            params = new Object[]{studentID};
+
+        } else if ("Teacher".equals(roles)) {
+            extraQuery = """
+                JOIN Teacher t ON t.userID = u.userID 
+                JOIN quizGroup qg ON t.teacherID = qg.teacherID
+                WHERE t.teacherID = ?
+                """;
+            params = new Object[]{teacherID};
+
+        } else {
+            // Fallback / error case
             return null;
+        }
+
+        return myconn.readQuery(baseQuery + extraQuery, params);
+    }
+
+    // ====================== Helper Methods ======================
+
+    private void setDateOrNull(PreparedStatement prep, int parameterIndex, LocalDateTime dateTime) throws Exception {
+        if (dateTime != null) {
+            prep.setDate(parameterIndex, java.sql.Date.valueOf(dateTime.toLocalDate()));
+        } else {
+            prep.setNull(parameterIndex, Types.DATE);
         }
     }
 
-    public void setTeacherID(int teacherID) {
-        this.teacherID = teacherID;
-    }
+    // ====================== Setters ======================
 
-    public void setQuizName(String quizName) {
-        this.quizName = quizName;
-    }
+    public void setTeacherID(int teacherID) { this.teacherID = teacherID; }
+    public void setQuizName(String quizName) { this.quizName = quizName; }
+    public void setHasTime(boolean hasTime) { this.hasTime = hasTime; }
+    public void setTimestamp(int timestamp) { this.timestamp = timestamp; }
+    public void setDeadline(LocalDateTime deadline) { this.deadline = deadline; }
+    public void setQuizGroupID(int quizGroupID) { this.quizGroupID = quizGroupID; }
+    public void setStudentID(int studentID) { this.studentID = studentID; }
+    public void setRoles(String roles) { this.roles = roles; }
 
-    public void setHasTime(boolean hasTime) {
-        this.hasTime = hasTime;
-    }
+    // ====================== Getters ======================
 
-    public void setTimestamp(int timestamp) {
-        this.timestamp = timestamp;
-    }
-
-    public void setDeadline(LocalDateTime deadline) {
-        this.deadline = deadline;
-    }
-
-    public void setQuizGroupID(int quizGroupID) {
-        System.out.println("Set Quiz ID group, " + quizGroupID);
-        this.quizGroupID = quizGroupID;
-    }
+    public String getRoles() { return roles; }
 }
