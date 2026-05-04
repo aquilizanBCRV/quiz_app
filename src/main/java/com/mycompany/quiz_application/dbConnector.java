@@ -5,6 +5,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 public class dbConnector {
 
@@ -55,7 +56,7 @@ public class dbConnector {
                 throw new IllegalStateException("Database not connected.");
             }
 
-            PreparedStatement pst = con.prepareStatement(query);
+            PreparedStatement pst = con.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
 
             if (params != null) {
                 for (int i = 0; i < params.length; i++) {
@@ -63,11 +64,19 @@ public class dbConnector {
                 }
             }
 
-            return pst.executeUpdate();
+            pst.executeUpdate();
+
+            ResultSet rs = pst.getGeneratedKeys();
+
+            if (rs.next()) {
+                return rs.getInt(1); // generated ID
+            }
+
+            return -1;
 
         } catch (SQLException e) {
             e.printStackTrace();
-            return 0;
+            return -1;
         }
     }
 

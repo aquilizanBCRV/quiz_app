@@ -1,7 +1,10 @@
 package com.mycompany.quiz_application.App.Login;
 
+import com.mycompany.quiz_application.App.Records.QuizGroupRecords;
 import com.mycompany.quiz_application.App.Review.Review_Query_Data;
 import com.mycompany.quiz_application.App.Review.finishedQuiz;
+import com.mycompany.quiz_application.App.addAccount.ModifyAccount;
+import com.mycompany.quiz_application.App.addAccount.ViewRecords;
 import com.mycompany.quiz_application.App.mainQuiz.ListOfGroupQuizes;
 import com.mycompany.quiz_application.App.mainQuiz.Quizes.appQuiz;
 import com.mycompany.quiz_application.Globals;
@@ -122,7 +125,7 @@ public class Dashboard extends JFrame {
                 int unfinishedData = (list.next()) ? list.getInt("unfinished_count") : 0;
 
                 unfinished = createCard(
-                        ""+unfinishedData,
+                        "" + unfinishedData,
                         "Students not taken quizzes",
                         30,
                         "/icons/student.png"
@@ -136,27 +139,51 @@ public class Dashboard extends JFrame {
                 );
 
                 viewRecords = createCard(
-                        "View Records",
+                        "Student Records",
                         "View taken quizzes",
                         16,
                         "/icons/records.png"
                 );
-
-                manageAccountsCard = createCard(
-                        "Manage Accounts",
-                        "Add/Edit students",
+                settingsCard = createCard(
+                        "Settings",
+                        "System settings",
                         16,
-                        "/icons/manage.png"
+                        "/icons/settings.png"
                 );
+//                manageAccountsCard = createCard(
+//                        "Manage Accounts",
+//                        "Add/Edit students",
+//                        16,
+//                        "/icons/manage.png"
+//                );
 
                 centerPanel.add(unfinished);
                 centerPanel.add(createQuizCard);
                 centerPanel.add(viewRecords);
-                centerPanel.add(manageAccountsCard);
+                centerPanel.add(viewRecords);
+                centerPanel.add(settingsCard);
             } catch (SQLException ex) {
                 System.getLogger(Dashboard.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
             }
 
+        }
+
+        if (Globals.getInstance().getRoles().equals("Admin")) {
+            manageAccountsCard = createCard(
+                    "Manage Accounts",
+                    "Add/Edit students",
+                    16,
+                    "/icons/manage.png"
+            );
+            settingsCard = createCard(
+                    "Settings",
+                    "System settings",
+                    16,
+                    "/icons/settings.png"
+            );
+
+            centerPanel.add(manageAccountsCard);
+            centerPanel.add(settingsCard);
         }
     }
 
@@ -210,7 +237,7 @@ public class Dashboard extends JFrame {
         mainPanel.add(bottomPanel, BorderLayout.SOUTH);
     }
 
-    static public void handleCardClick(String title) {
+    static public void handleCardClick(String title) throws SQLException {
 
         switch (title) {
 
@@ -225,7 +252,11 @@ public class Dashboard extends JFrame {
                 break;
 
             case "Manage Accounts":
-                System.out.println("Manage Accounts");
+                Globals.getInstance().setManageAccount(false);
+                ViewRecords vw = new ViewRecords();
+                vw.setVisible(true);
+                
+                frame.setVisible(false);
                 break;
 
             case "Records":
@@ -237,8 +268,24 @@ public class Dashboard extends JFrame {
 
                 break;
 
+            case "Student Records":
+                QuizGroupRecords rec = new QuizGroupRecords();
+                frame.setVisible(false);
+                rec.setWindow(true);
+                break;
             case "Settings":
-                System.out.println("Open Settings");
+                ModifyAccount acc = new ModifyAccount();
+
+                Globals.getInstance().setManageAccount(true);
+
+                acc.upDateQuery(
+                        Globals.getInstance().getUserID(),
+                        Globals.getInstance().getRoles()
+                );
+
+                acc.setVisible(true);
+
+                frame.setVisible(false);
                 break;
         }
     }
@@ -327,7 +374,11 @@ public class Dashboard extends JFrame {
 
             @Override
             public void mouseClicked(MouseEvent e) {
-                handleCardClick(title);
+                try {
+                    handleCardClick(title);
+                } catch (SQLException ex) {
+                    System.getLogger(Dashboard.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+                }
             }
 
             @Override

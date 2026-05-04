@@ -169,7 +169,7 @@ public class ListOfQuizes extends javax.swing.JFrame {
             } else if (text.equals("Back")) {
 
                 ListOfGroupQuizes add = new ListOfGroupQuizes();
-                add.setVisible(true);
+                add.setWindow(true);
                 ListOfQuizes.frame.setVisible(false);
             }
         });

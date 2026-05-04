@@ -36,6 +36,25 @@ public class Review_Query_Data {
         this.myconn = conn;
     }
 
+    public ResultSet displayStudentList() {
+        return myconn.readQuery("""
+         SELECT 
+              s.studentID,
+              ac.*,
+              CONCAT_WS(' ', firstname, middleName, lastname) AS fullname                         
+              ,qg.quizGroupID, qg.quizName,
+              p.status
+          FROM quizGroup qg
+          JOIN Student s ON s.teacherID = qg.teacherID
+          JOIN accountUser ac ON ac.userID = s.userID
+          LEFT JOIN progress p 
+              ON p.quizGroupID = qg.quizGroupID 
+             AND p.studentID = s.studentID
+          AND (p.status = 'done' OR p.status IS NULL OR p.status <> 'done')
+        WHERE qg.quizGroupID = ? AND qg.teacherID= ?
+        """, new Object[]{quizGroupID, teacherID});
+    }
+
     public ResultSet displayReview() {
         return myconn.readQuery("""
           SELECT * FROM quiz_application.answerLog 
@@ -65,13 +84,13 @@ public class Review_Query_Data {
 
         if ("Student".equals(roles)) {
             extraQuery = """
-                AND p.studentID = ?
+                AND s.studentID = ?
                 """;
             params = new Object[]{studentID};
 
         } else if ("Teacher".equals(roles)) {
             extraQuery = """   
-                AND qg.teacherID = ?
+                And qg.teacherID = ?
                 """;
             params = new Object[]{teacherID};
 
@@ -80,16 +99,18 @@ public class Review_Query_Data {
             return null;
         }
         return myconn.readQuery("""
-        SELECT COUNT(*) AS unfinished_count
-        FROM quizGroup qg
-        LEFT JOIN progress p
-            ON qg.quizGroupID = p.quizGroupID
-            %s
-        WHERE qg.published = 1
-        AND (
-            p.status IS NULL
-            OR p.status != 'done'
-        );
+                                
+     SELECT 
+                      COUNT(*) AS unfinished_count
+                  FROM quizGroup qg
+                  JOIN Student s ON s.teacherID = qg.teacherID
+                  JOIN accountUser ac ON ac.userID = s.userID
+                  LEFT JOIN progress p 
+                      ON p.quizGroupID = qg.quizGroupID 
+                     AND p.studentID = s.studentID
+                  WHERE (p.status IS NULL OR p.status != 'done')
+                  AND published = 1
+                  %s
         """.formatted(extraQuery), new Object[]{studentID});
 
     }

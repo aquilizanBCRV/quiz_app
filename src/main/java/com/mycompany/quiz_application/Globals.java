@@ -6,6 +6,24 @@ public class Globals {
 
     private int studentID = 0;
     private int teacherID = 0;
+    private int userID = 0;
+
+    private boolean  manageAccount;
+
+    public boolean isManageAccount() {
+        return manageAccount;
+    }
+
+    public void setManageAccount(boolean manageAccount) {
+        this.manageAccount = manageAccount;
+    }
+    public int getUserID() {
+        return userID;
+    }
+
+    public void setUserID(int userID) {
+        this.userID = userID;
+    }
 
     public int getTeacherID() {
         return teacherID;

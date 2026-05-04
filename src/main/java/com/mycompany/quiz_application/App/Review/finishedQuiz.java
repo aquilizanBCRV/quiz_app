@@ -6,6 +6,7 @@ package com.mycompany.quiz_application.App.Review;
 
 import com.formdev.flatlaf.FlatLightLaf;
 import com.mycompany.quiz_application.App.Login.Dashboard;
+import com.mycompany.quiz_application.App.Records.QuizGroupRecords;
 import com.mycompany.quiz_application.Globals;
 import com.mycompany.quiz_application.dbConnector;
 import com.mysql.cj.xdevapi.Result;
@@ -27,6 +28,7 @@ public class finishedQuiz extends javax.swing.JFrame {
     private static Review_Query_Data review = new Review_Query_Data(new dbConnector());
 
     public static int id = 0;
+    public static boolean isDone = false;
 
     /**
      * Creates new form finishedQuiz
@@ -56,12 +58,13 @@ public class finishedQuiz extends javax.swing.JFrame {
         setBackground(new java.awt.Color(255, 255, 255));
 
         table.setBackground(Color.WHITE);
+        table.setFont(new java.awt.Font("Liberation Sans", 0, 14)); // NOI18N
         table.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
             },
             new String [] {
-                "#", "ID", "Quiz Name", "Teacher"
+                "#", "ID", "Quiz Name", "Teacher", "remarks"
             }
         ));
         jScrollPane1.setViewportView(table);
@@ -71,6 +74,9 @@ public class finishedQuiz extends javax.swing.JFrame {
             table.getColumnModel().getColumn(0).setMaxWidth(50);
             table.getColumnModel().getColumn(1).setMinWidth(0);
             table.getColumnModel().getColumn(1).setMaxWidth(0);
+            table.getColumnModel().getColumn(4).setMinWidth(70);
+            table.getColumnModel().getColumn(4).setPreferredWidth(70);
+            table.getColumnModel().getColumn(4).setMaxWidth(70);
         }
 
         jButton1.setBackground(new java.awt.Color(51, 51, 51));
@@ -82,7 +88,7 @@ public class finishedQuiz extends javax.swing.JFrame {
         Review.setBackground(new java.awt.Color(51, 51, 51));
         Review.setFont(new java.awt.Font("Liberation Sans", 1, 15)); // NOI18N
         Review.setForeground(new java.awt.Color(255, 255, 255));
-        Review.setText("View Result");
+        Review.setText("View Answer");
         Review.addActionListener(this::ReviewActionPerformed);
 
         jButton3.setBackground(new java.awt.Color(51, 51, 51));
@@ -131,9 +137,15 @@ public class finishedQuiz extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "Selected row required !");
             return;
         }
+        if (Globals.getInstance().getRoles().equals("Teacher") && !isDone) {
+            JOptionPane.showMessageDialog(this, "No records Found !");
+            return;
+        }
+        isDone = false;
+        
         ReviewQuiz result = new ReviewQuiz();
-        Globals.getInstance().setQuizGroupID(id);
-        Globals.getInstance().setStudentID(Globals.getInstance().getStudentID());
+        Globals.getInstance().setQuizGroupID( Globals.getInstance().getQuizGroupID());
+        Globals.getInstance().setStudentID(id);
         setVisible(false);
         result.displayData();
         result.setVisible(true);
@@ -145,9 +157,13 @@ public class finishedQuiz extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "Selected row required !");
             return;
         }
+         if (Globals.getInstance().getRoles().equals("Teacher") && !isDone) {
+            JOptionPane.showMessageDialog(this, "No records Found !");
+            return;
+        }
         QuizResult result = new QuizResult();
-        Globals.getInstance().setQuizGroupID(id);
-        Globals.getInstance().setStudentID(1);
+        Globals.getInstance().setQuizGroupID( Globals.getInstance().getQuizGroupID());
+        Globals.getInstance().setStudentID(id);
         setVisible(false);
         result.showResult();
         result.setVisible(true);
@@ -157,28 +173,77 @@ public class finishedQuiz extends javax.swing.JFrame {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
-        Dashboard dash = new Dashboard();
-        dash.setWindow(true);
-        setVisible(false);
+
+        if (Globals.getInstance().getRoles().equals("Teacher")) {
+            QuizGroupRecords rev = new QuizGroupRecords();
+            rev.setWindow(true);
+        } else {
+
+            Dashboard dash = new Dashboard();
+            dash.setWindow(true);
+
+        }
+
+        dispose();
     }//GEN-LAST:event_jButton1ActionPerformed
     public void displayData() {
-        review.setStudentID(1);
+
         DefaultTableModel model = (DefaultTableModel) table.getModel();
+        model.setRowCount(0); // clear previous data
 
         try {
-            ResultSet list = review.displayQuiz();
-            int counter = 0;
-            while (list.next()) {
-                System.out.println(list.getInt("studentID"));
-                model.addRow(new Object[]{
-                    ++counter,
-                    list.getInt("quizGroupID"),
-                    list.getString("quizName"),
-                    list.getString("fullname")
-                });
+            ResultSet list;
+
+            if (Globals.getInstance().getRoles().equals("Teacher")) {
+
+                review.setQuizGroupID(Globals.getInstance().getQuizGroupID());
+                review.setTeacherID(Globals.getInstance().getTeacherID());
+
+                list = review.displayStudentList();
+
+                int counter = 0;
+
+                while (list.next()) {
+                    model.addRow(new Object[]{
+                        ++counter,
+                        list.getInt("studentID"),
+                        list.getString("quizName"),
+                        list.getString("fullname"),
+                        "done".equals(list.getString("status")) ? "done" : "not finished"
+                    });
+                    System.out.println(list.getInt("studentID"));
+                }
+
+                // CHANGE COLUMN NAME (index 3 = fullname)
+                table.getColumnModel().getColumn(3).setHeaderValue("Student Name");
+                table.getTableHeader().repaint();
+
+            } else {
+
+                review.setStudentID(Globals.getInstance().getStudentID());
+
+                list = review.displayQuiz();
+
+                int counter = 0;
+
+                while (list.next()) {
+                    model.addRow(new Object[]{
+                        ++counter,
+                        list.getInt("studentID"),
+                        list.getString("quizName"),
+                        list.getString("fullname"),
+                        
+                        "done".equals(list.getString("status")) ? "done" : "not finished"
+                    });
+                }
+
+//                table.getColumnModel().getColumn(3).setHeaderValue("Full Name");
+//                table.getTableHeader().repaint();
             }
+
         } catch (SQLException ex) {
-            System.getLogger(finishedQuiz.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+            System.getLogger(finishedQuiz.class.getName())
+                    .log(System.Logger.Level.ERROR, (String) null, ex);
         }
 
         table.addMouseListener(new MouseAdapter() {
@@ -192,6 +257,10 @@ public class finishedQuiz extends javax.swing.JFrame {
 
                     Object secondColumnValue = model.getValueAt(modelRow, 1);
 
+                    if (Globals.getInstance().getRoles().equals("Teacher")) {
+                        Object isFInish = model.getValueAt(modelRow, 4);
+                        isDone = (isFInish.equals("done")) ? true : false;
+                    }
                     id = (int) secondColumnValue;
                     System.out.println("Selected Row: " + modelRow);
                     System.out.println("2nd Column Value: " + secondColumnValue);

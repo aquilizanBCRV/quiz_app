@@ -114,7 +114,9 @@ public class QuizGroup_Query_Data {
                 JOIN quizGroup qg ON t.teacherID = qg.teacherID
                 LEFT JOIN progress p ON p.quizGroupID = qg.quizGroupID  
                 WHERE (p.progressID IS NULL OR p.status != 'done')
-                  AND p.studentID = ?
+                          AND ( p.studentID  IS NULL OR p.studentID = ?)
+                         AND deadline > CURRENT_DATE
+                         AND qg.published = 1
                 """;
             params = new Object[]{studentID};
 

@@ -37,9 +37,7 @@ public class Auth_Query_Data {
                 tableName = "Student";
             } else if (roles.equals("Teacher")) {
                 tableName = "Teacher";
-            } else {
-                throw new IllegalArgumentException("Invalid role");
-            }
+            } 
 
            String loginQuery = """
         SELECT *

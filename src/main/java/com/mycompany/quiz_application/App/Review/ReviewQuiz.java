@@ -60,6 +60,7 @@ public class ReviewQuiz extends javax.swing.JFrame {
         setBackground(new java.awt.Color(255, 255, 255));
 
         table.setBackground(Color.WHITE);
+        table.setFont(table.getFont().deriveFont(table.getFont().getSize()+5f));
         table.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
@@ -73,9 +74,9 @@ public class ReviewQuiz extends javax.swing.JFrame {
             table.getColumnModel().getColumn(0).setMinWidth(50);
             table.getColumnModel().getColumn(0).setPreferredWidth(50);
             table.getColumnModel().getColumn(0).setMaxWidth(50);
-            table.getColumnModel().getColumn(1).setMinWidth(50);
-            table.getColumnModel().getColumn(1).setPreferredWidth(50);
-            table.getColumnModel().getColumn(1).setMaxWidth(50);
+            table.getColumnModel().getColumn(1).setMinWidth(80);
+            table.getColumnModel().getColumn(1).setPreferredWidth(80);
+            table.getColumnModel().getColumn(1).setMaxWidth(80);
         }
 
         jButton1.setBackground(new java.awt.Color(51, 51, 51));

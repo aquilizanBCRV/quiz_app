@@ -8,6 +8,7 @@ import com.mycompany.quiz_application.App.mainQuiz.Quiz_Query_Data;
 import com.mycompany.quiz_application.dbConnector;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalTime;
 
 /**
@@ -39,41 +40,74 @@ public class QuizLog_Query_Data extends Quiz_Query_Data {
     }
 
     public void saveProgress() {
-        String sql = """
-    INSERT INTO progress (
-        studentID,
-        quizGroupID,
-        quizCounter,
-        currentTimestamp,
-        status
-    )
-    VALUES (
-        ?,
-        ?,
-        ?,
-        ?,
-        ?
-    )
-    ON DUPLICATE KEY UPDATE
-        quizCounter = VALUES(quizCounter),
-        currentTimestamp = VALUES(currentTimestamp),
-        status = VALUES(status);
-    """;
+        final String CHECK_PROGRESS_SQL = """
+        SELECT progressID
+        FROM progress
+        WHERE studentID = ?
+          AND quizGroupID = ?
+        """;
 
-        try (PreparedStatement ps = myconn.con.prepareStatement(sql)) {
+        final String UPDATE_PROGRESS_SQL = """
+        UPDATE progress
+        SET quizCounter = ?,
+            currentTimestamp = ?,
+            status = ?
+        WHERE studentID = ?
+          AND quizGroupID = ?
+          AND progressID = ?
+        """;
 
-            ps.setInt(1, studentID);
-            ps.setInt(2, quizGroupID);
-            ps.setInt(3, counter);
+        final String INSERT_PROGRESS_SQL = """
+        INSERT INTO progress (
+            studentID,
+            quizGroupID,
+            quizCounter,
+            currentTimestamp,
+            status
+        )
+        VALUES (?, ?, ?, ?, ?)
+        """;
 
-            // Use Timestamp instead of Time
-            ps.setTime(4, java.sql.Time.valueOf(timestamp));
-            ps.setString(5, status);
+        try {
+            ResultSet result = myconn.readQuery(
+                    CHECK_PROGRESS_SQL,
+                    new Object[]{studentID, quizGroupID}
+            );
 
-            ps.executeUpdate();
+            java.sql.Time sqlTime = java.sql.Time.valueOf(timestamp);
+
+            if (result.next()) {
+
+                int progressID = result.getInt("progressID");
+
+                myconn.executeUpdate(
+                        UPDATE_PROGRESS_SQL,
+                        new Object[]{
+                            counter,
+                            sqlTime,
+                            status,
+                            studentID,
+                            quizGroupID,
+                            progressID
+                        }
+                );
+
+            } else {
+
+                myconn.executeUpdate(
+                        INSERT_PROGRESS_SQL,
+                        new Object[]{
+                            studentID,
+                            quizGroupID,
+                            counter,
+                            sqlTime,
+                            status
+                        }
+                );
+            }
 
         } catch (Exception e) {
-            System.err.println(e);
+            e.printStackTrace();
         }
     }
 
