@@ -52,8 +52,7 @@ public class QuizApp_Login {
         nav.add(loginBtn, BorderLayout.EAST);
 
         // CENTER
-        JPanel center = new JPanel();
-        center.setBackground(new Color(245, 245, 245));
+        JPanel center = new BackgroundPanel("/images/bg.jpg");
         center.setLayout(new BoxLayout(center, BoxLayout.Y_AXIS));
 
         JLabel title = new JLabel("Test Your Knowledge");

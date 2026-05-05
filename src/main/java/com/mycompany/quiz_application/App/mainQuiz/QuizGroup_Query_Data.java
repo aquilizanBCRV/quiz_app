@@ -100,9 +100,52 @@ public class QuizGroup_Query_Data {
 
     public ResultSet displayQuiz() {
         String baseQuery = """
-            SELECT *,
-                   CONCAT_WS(' ', u.firstname, u.middleName, u.lastname) AS fullname
-            FROM accountUser u
+        SELECT 
+            	q.quizGroupID,
+                q.quizName,
+                -- Teacher Name
+                CONCAT(
+                    tUser.firstname, ' ',
+                    tUser.lastname
+                ) AS fullname,
+            
+                -- Student Name
+                CONCAT(
+                    sUser.firstname, ' ',
+                    sUser.lastname
+                ) AS studentName,
+            
+                s.studentID,
+                q.published,
+                
+            
+                -- If no progress record, display Not Done
+                COALESCE(p.status, 'Not Done') AS quizStatus
+            
+            FROM Student s
+            
+            -- Student Account
+            INNER JOIN accountUser sUser
+                ON s.userID = sUser.userID
+            
+            -- Teacher
+            INNER JOIN Teacher t
+                ON s.teacherID = t.teacherID
+            
+            -- Teacher Account
+            INNER JOIN accountUser tUser
+                ON t.userID = tUser.userID
+            
+            -- Show all quiz groups
+            CROSS JOIN quizGroup q
+            
+            -- Progress may or may not exist
+            LEFT JOIN progress p
+                ON p.studentID = s.studentID
+                AND p.quizGroupID = q.quizGroupID
+            WHERE q.published = 1
+            %s
+            ORDER BY q.quizName, studentName;
             """;
 
         Object[] params;
@@ -110,21 +153,15 @@ public class QuizGroup_Query_Data {
 
         if ("Student".equals(roles)) {
             extraQuery = """
-                JOIN Teacher t ON t.userID = u.userID 
-                JOIN quizGroup qg ON t.teacherID = qg.teacherID
-                LEFT JOIN progress p ON p.quizGroupID = qg.quizGroupID  
-                WHERE (p.progressID IS NULL OR p.status != 'done')
-                          AND ( p.studentID  IS NULL OR p.studentID = ?)
-                         AND deadline > CURRENT_DATE
-                         AND qg.published = 1
+                AND p.status IS  NULL
+                AND s.studentID = ?
                 """;
             params = new Object[]{studentID};
+            System.err.println(studentID);
 
         } else if ("Teacher".equals(roles)) {
             extraQuery = """
-                JOIN Teacher t ON t.userID = u.userID 
-                JOIN quizGroup qg ON t.teacherID = qg.teacherID
-                WHERE t.teacherID = ?
+                AND t.teacherID = ?
                 """;
             params = new Object[]{teacherID};
 
@@ -133,7 +170,7 @@ public class QuizGroup_Query_Data {
             return null;
         }
 
-        return myconn.readQuery(baseQuery + extraQuery, params);
+        return myconn.readQuery(baseQuery.formatted(extraQuery), params);
     }
 
     // ====================== Helper Methods ======================

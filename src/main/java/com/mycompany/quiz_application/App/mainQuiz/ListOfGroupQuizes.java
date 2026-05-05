@@ -12,6 +12,8 @@ import javax.swing.table.JTableHeader;
 import java.awt.*;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashSet;
+import java.util.Set;
 
 public class ListOfGroupQuizes extends JFrame {
 
@@ -116,23 +118,34 @@ public class ListOfGroupQuizes extends JFrame {
     private static void AddRowData(DefaultTableModel model) {
 
         if (Globals.getInstance().getRoles().equals("Student")) {
-            quiz.setTeacherID(Globals.getInstance().getStudentID());
+            System.out.println(Globals.getInstance().getStudentID());
+            quiz.setStudentID(Globals.getInstance().getStudentID());
             quiz.setRoles("Student");
 
             table.getColumnModel().getColumn(4).setMinWidth(0);
             table.getColumnModel().getColumn(4).setMaxWidth(0);
             table.getColumnModel().getColumn(4).setWidth(0);
-        } 
-        else if (Globals.getInstance().getRoles().equals("Teacher")) {
+        } else if (Globals.getInstance().getRoles().equals("Teacher")) {
             quiz.setTeacherID(Globals.getInstance().getTeacherID());
             quiz.setRoles("Teacher");
         }
 
         ResultSet quizList = quiz.displayQuiz();
         int counter = 0;
+        Set<Integer> displayedQuizIDs = new HashSet<>();
 
         try {
             while (quizList.next()) {
+
+                int quizGroupID = quizList.getInt("quizGroupID");
+
+                // Skip duplicate quizGroupID
+                if (displayedQuizIDs.contains(quizGroupID)) {
+                    continue;
+                }
+
+                displayedQuizIDs.add(quizGroupID);
+
                 counter++;
                 model.addRow(new Object[]{
                     quizList.getInt("quizGroupID"),

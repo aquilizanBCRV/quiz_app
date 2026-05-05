@@ -13,6 +13,8 @@ import javax.swing.table.JTableHeader;
 import java.awt.*;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashSet;
+import java.util.Set;
 
 public class QuizGroupRecords extends JFrame {
 
@@ -29,7 +31,6 @@ public class QuizGroupRecords extends JFrame {
 
     static JButton viewScores;
     static JButton back;
-
 
     private static QuizGroup_Query_Data quiz = new QuizGroup_Query_Data(new dbConnector());
 
@@ -115,10 +116,20 @@ public class QuizGroupRecords extends JFrame {
 
         ResultSet quizList = quiz.displayQuiz();
         int counter = 0;
+        Set<Integer> displayedQuizIDs = new HashSet<>();
 
         try {
+            
             while (quizList.next()) {
                 counter++;
+            int quizGroupID = quizList.getInt("quizGroupID");
+
+            // Skip duplicate quizGroupID
+            if (displayedQuizIDs.contains(quizGroupID)) {
+                continue;
+            }
+
+            displayedQuizIDs.add(quizGroupID);
                 model.addRow(new Object[]{
                     quizList.getInt("quizGroupID"),
                     counter,
@@ -157,7 +168,7 @@ public class QuizGroupRecords extends JFrame {
             switch (text) {
 
                 case "Open" -> {
-                    
+
                     Globals.getInstance().setQuizGroupID(id);
                     finishedQuiz finished = new finishedQuiz();
                     finished.setVisible(true);
