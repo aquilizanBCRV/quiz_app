@@ -4,18 +4,21 @@
  */
 package com.mycompany.quiz_application.App.mainQuiz.Quizes;
 
+import com.mycompany.quiz_application.Globals;
 import com.mycompany.quiz_application.App.mainQuiz.Quiz_Query_Data;
 import com.mycompany.quiz_application.dbConnector;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Time;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.AbstractButton;
 import javax.swing.ButtonModel;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.Timer;
@@ -28,7 +31,7 @@ import javax.swing.text.View;
 public class appQuiz extends javax.swing.JFrame {
 
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(appQuiz.class.getName());
-
+//    static Globals global = new Globals(); 
     static dbConnector conn = new dbConnector();
     static QuizLog_Query_Data log = new QuizLog_Query_Data(conn);
     private Timer timer;
@@ -58,7 +61,9 @@ public class appQuiz extends javax.swing.JFrame {
 
     private void initializeQuiz() {
         Quiz_Query_Data quiz = new Quiz_Query_Data(conn);
-        quiz.setQuizGroupID(1);
+
+        quiz.setQuizGroupID(Globals.getInstance().getQuizGroupID());
+
         ResultSet quizList = quiz.displayQuiz();
 
         try {
@@ -71,11 +76,39 @@ public class appQuiz extends javax.swing.JFrame {
                 ++totalQuizes;
             }
 
-            // Show first quiz
-            if (!quizQuestions.isEmpty()) {
-                labelDisplayQuiz.setText(quizQuestions.get(currentIndex));
-                displayAnswerList(currentIndex);
+            // Show first quizlog.setStudentID(Globals.getInstance().getStudentID());
+            log.setquizGroupID(Globals.getInstance().getQuizGroupID());
+
+            log.setStudentID(Globals.getInstance().getStudentID());
+            ResultSet savedProgress = log.setProgress();
+
+            if (savedProgress != null && savedProgress.next()) {
+                System.out.println("Progessed Detected");
+                // Has at least one row
+                int setPage = savedProgress.getInt("quizCounter");
+                Time setTime = savedProgress.getTime("currentTimestamp");
+                int minute = setTime.toLocalTime().getMinute();
+
+                labelDisplayQuiz.setText(quizQuestions.get(setPage));
+                displayAnswerList(setPage);
+                currentIndex = setPage;
+                LocalTime savedTime = setTime.toLocalTime();
+
+                counter
+                        = savedTime.getHour() * 3600
+                        + savedTime.getMinute() * 60
+                        + savedTime.getSecond();
                 getCounter();
+
+            } else {
+                // Empty result
+                if (!quizQuestions.isEmpty()) {
+                    labelDisplayQuiz.setText(quizQuestions.get(currentIndex));
+                    displayAnswerList(currentIndex);
+
+                    getCounter();
+                }
+
             }
 
         } catch (Exception e) {
@@ -88,9 +121,9 @@ public class appQuiz extends javax.swing.JFrame {
         buttonGroup1.add(selection_2);
         buttonGroup1.add(selection_4);
         buttonGroup1.add(selection_6);
-        
-       buttonGroup2.add(falseSelect);
-       buttonGroup2.add(trueSelect);
+
+        buttonGroup2.add(falseSelect);
+        buttonGroup2.add(trueSelect);
 
         // Stop existing timer if running
         if (timer != null && timer.isRunning()) {
@@ -98,8 +131,6 @@ public class appQuiz extends javax.swing.JFrame {
         }
 
         // Reset counter
-        counter = 0;
-
         // Create new timer
         timer = new Timer(1000, new ActionListener() { // 1000ms = 1 second
             @Override
@@ -137,7 +168,7 @@ public class appQuiz extends javax.swing.JFrame {
         ButtonModel selectedModel = buttonGroup1.getSelection();
 
         log.setQuizID(quizID.get(currentIndex));
-        log.setStudentID(1);
+        log.setStudentID(Globals.getInstance().getStudentID());
         if (questionType.get(currentIndex).equals("1")) {
             log.setStudentAnswer(
                     buttonGroup1.getSelection().getActionCommand());
@@ -148,6 +179,16 @@ public class appQuiz extends javax.swing.JFrame {
         }
         log.setTimestamp(LocalTime.of(0, 0, counter));
         log.createQuiz();
+        saveProgress("undone");
+    }
+
+    public void saveProgress(String status) {
+        log.setStudentID(Globals.getInstance().getStudentID());
+        log.setquizGroupID(Globals.getInstance().getQuizGroupID());
+        log.setCounter(currentIndex);
+        log.setTimestamp(LocalTime.of(0, 0, counter));
+        log.setStatus(status);
+        log.saveProgress();
     }
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -177,6 +218,11 @@ public class appQuiz extends javax.swing.JFrame {
         nextPage = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
+            }
+        });
 
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
         jPanel1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
@@ -425,7 +471,6 @@ public class appQuiz extends javax.swing.JFrame {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(0, 0, 0)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel9)
@@ -481,15 +526,26 @@ public class appQuiz extends javax.swing.JFrame {
         if (currentIndex < quizQuestions.size() - 1) {
             currentIndex++;
             labelDisplayQuiz.setText(quizQuestions.get(currentIndex));
-            restartTimer();
             displayAnswerList(currentIndex);
             getCounter();
+            restartTimer();
         } else {
-            labelDisplayQuiz.setText("End of quiz");
             timer.stop();
             labelTimer.setText("00:00");
+            JOptionPane.showMessageDialog(this, "You finish the quizes. You will redirect to the result...");
+            QuizResult qr = new QuizResult();
+            qr.showResult();
+            saveProgress("done");
+            setVisible(false);
+            qr.setVisible(true);
+
         }
     }//GEN-LAST:event_nextPageActionPerformed
+
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+        // TODO add your handling code here:
+        saveProgress("saved");
+    }//GEN-LAST:event_formWindowClosing
     private void displayAnswerList(int currentIndex) {
         String[] output = listQuestion.get(currentIndex).split(",");
 

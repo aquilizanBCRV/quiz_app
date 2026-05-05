@@ -1,86 +1,200 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
-
 package com.mycompany.quiz_application.App.mainQuiz;
 
 import com.mycompany.quiz_application.dbConnector;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Types;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.util.Objects;
 
-/**
- *
- * @author yuzuki
- */
 public class QuizGroup_Query_Data {
 
-    private dbConnector myconn;
-    
+    private final dbConnector myconn;
+
+    // Fields
+    private int quizGroupID;
     private int teacherID;
     private String quizName;
     private boolean hasTime;
-    private LocalTime timestamp;
+    private int timestamp;
+    private int studentID;
     private LocalDateTime deadline;
+    private String roles;
 
     public QuizGroup_Query_Data(dbConnector conn) {
-        this.myconn = conn;
+        this.myconn = Objects.requireNonNull(conn, "Connector cannot be null");
     }
 
+    // ====================== CRUD Operations ======================
+
     public void createQuizGroup() {
-        String insertQuery = """
-                             INSERT INTO quizGroup
-                             (teacherID,quizName,hasTime,timestamp,deadline)
-                             VALUES(?,?,?,?,?)
-                             """;
+        String sql = """
+            INSERT INTO quizGroup (teacherID, quizName, hasTime, timestamp, deadline)
+            VALUES (?, ?, ?, ?, ?)
+            """;
+
         try {
             myconn.connect();
-            PreparedStatement prep = myconn.con.prepareStatement(insertQuery);
+            try (PreparedStatement prep = myconn.con.prepareStatement(sql)) {
+                prep.setInt(1, teacherID);
+                prep.setString(2, quizName);
+                prep.setBoolean(3, hasTime);
+                prep.setInt(4, timestamp);
+                setDateOrNull(prep, 5, deadline);
 
-            prep.setInt(1, teacherID);
-            prep.setString(2, quizName);
-            prep.setBoolean(3, hasTime);
-
-            if (hasTime) {
-                prep.setTime(4, java.sql.Time.valueOf(timestamp));
-            } else {
-                prep.setNull(4, java.sql.Types.TIME);
+                int rows = prep.executeUpdate();
+                System.out.println(rows > 0 ? "Quiz group created successfully" : "Failed to create quiz group");
             }
-
-            prep.setTimestamp(5, java.sql.Timestamp.valueOf(deadline));
-
-            int rowsInserted = prep.executeUpdate();
-
-            if (rowsInserted > 0) {
-                System.out.println("Insert successful");
-            } else {
-                System.out.println("Insert failed");
-            }
-
         } catch (Exception e) {
-            System.out.println(e);
+            e.printStackTrace();
         }
     }
 
-    public void setTeacherID(int teacherID) {
-        this.teacherID = teacherID;
+    public void updateQuizGroup() {
+        String sql = """
+            UPDATE quizGroup
+            SET teacherID = ?, 
+                quizName = ?, 
+                hasTime = ?, 
+                timestamp = ?, 
+                deadline = ?
+            WHERE quizGroupID = ?
+            """;
+
+        try {
+            myconn.connect();
+            try (PreparedStatement prep = myconn.con.prepareStatement(sql)) {
+                prep.setInt(1, teacherID);
+                prep.setString(2, quizName);
+                prep.setBoolean(3, hasTime);
+                prep.setInt(4, timestamp);
+                setDateOrNull(prep, 5, deadline);
+                prep.setInt(6, quizGroupID);
+
+                int rows = prep.executeUpdate();
+                System.out.println(rows > 0 ? "Quiz group updated successfully" : "No record updated");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
-    public void setQuizName(String quizName) {
-        this.quizName = quizName;
+    public void deleteQuizGroup() {
+        myconn.executeUpdate("DELETE FROM quizGroup WHERE quizGroupID = ?", 
+                            new Object[]{quizGroupID});
     }
 
-    public void setHasTime(boolean hasTime) {
-        this.hasTime = hasTime;
+    public ResultSet getQuizGroup() {
+        return myconn.readQuery("""
+            SELECT * FROM quizGroup WHERE quizGroupID = ?
+            """, new Object[]{quizGroupID});
     }
 
-    public void setTimestamp(LocalTime timestamp) {
-        this.timestamp = timestamp;
+    public void publish() {
+        myconn.executeUpdate("""
+            UPDATE quizGroup SET published = 1 WHERE quizGroupID = ?
+            """, new Object[]{quizGroupID});
     }
 
-    public void setDeadline(LocalDateTime deadline) {
-        this.deadline = deadline;
+    // ====================== Display / Query ======================
+
+    public ResultSet displayQuiz() {
+        String baseQuery = """
+        SELECT 
+            	q.quizGroupID,
+                q.quizName,
+                -- Teacher Name
+                CONCAT(
+                    tUser.firstname, ' ',
+                    tUser.lastname
+                ) AS fullname,
+            
+                -- Student Name
+                CONCAT(
+                    sUser.firstname, ' ',
+                    sUser.lastname
+                ) AS studentName,
+            
+                s.studentID,
+                q.published,
+                
+            
+                -- If no progress record, display Not Done
+                COALESCE(p.status, 'Not Done') AS quizStatus
+            
+            FROM Student s
+            
+            -- Student Account
+            INNER JOIN accountUser sUser
+                ON s.userID = sUser.userID
+            
+            -- Teacher
+            INNER JOIN Teacher t
+                ON s.teacherID = t.teacherID
+            
+            -- Teacher Account
+            INNER JOIN accountUser tUser
+                ON t.userID = tUser.userID
+            
+            -- Show all quiz groups
+            CROSS JOIN quizGroup q
+            
+            -- Progress may or may not exist
+            LEFT JOIN progress p
+                ON p.studentID = s.studentID
+                AND p.quizGroupID = q.quizGroupID
+            WHERE q.published = 1
+            %s
+            ORDER BY q.quizName, studentName;
+            """;
+
+        Object[] params;
+        String extraQuery;
+
+        if ("Student".equals(roles)) {
+            extraQuery = """
+                AND p.status IS  NULL
+                AND s.studentID = ?
+                """;
+            params = new Object[]{studentID};
+            System.err.println(studentID);
+
+        } else if ("Teacher".equals(roles)) {
+            extraQuery = """
+                AND t.teacherID = ?
+                """;
+            params = new Object[]{teacherID};
+
+        } else {
+            // Fallback / error case
+            return null;
+        }
+
+        return myconn.readQuery(baseQuery.formatted(extraQuery), params);
     }
+
+    // ====================== Helper Methods ======================
+
+    private void setDateOrNull(PreparedStatement prep, int parameterIndex, LocalDateTime dateTime) throws Exception {
+        if (dateTime != null) {
+            prep.setDate(parameterIndex, java.sql.Date.valueOf(dateTime.toLocalDate()));
+        } else {
+            prep.setNull(parameterIndex, Types.DATE);
+        }
+    }
+
+    // ====================== Setters ======================
+
+    public void setTeacherID(int teacherID) { this.teacherID = teacherID; }
+    public void setQuizName(String quizName) { this.quizName = quizName; }
+    public void setHasTime(boolean hasTime) { this.hasTime = hasTime; }
+    public void setTimestamp(int timestamp) { this.timestamp = timestamp; }
+    public void setDeadline(LocalDateTime deadline) { this.deadline = deadline; }
+    public void setQuizGroupID(int quizGroupID) { this.quizGroupID = quizGroupID; }
+    public void setStudentID(int studentID) { this.studentID = studentID; }
+    public void setRoles(String roles) { this.roles = roles; }
+
+    // ====================== Getters ======================
+
+    public String getRoles() { return roles; }
 }

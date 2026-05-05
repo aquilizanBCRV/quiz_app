@@ -1,7 +1,8 @@
-package com.mycompany.quiz_application.App.mainQuiz;
+package com.mycompany.quiz_application.App.Records;
 
+import com.mycompany.quiz_application.App.mainQuiz.*;
 import com.mycompany.quiz_application.App.Login.Dashboard;
-import static com.mycompany.quiz_application.App.mainQuiz.ListOfQuizes.id;
+import com.mycompany.quiz_application.App.Review.finishedQuiz;
 import com.mycompany.quiz_application.App.mainQuiz.Quizes.appQuiz;
 import com.mycompany.quiz_application.Globals;
 import com.mycompany.quiz_application.dbConnector;
@@ -15,7 +16,7 @@ import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Set;
 
-public class ListOfGroupQuizes extends JFrame {
+public class QuizGroupRecords extends JFrame {
 
     private static final Color CARD = Color.WHITE;
     private static final Color TEXT = new Color(40, 40, 40);
@@ -25,14 +26,11 @@ public class ListOfGroupQuizes extends JFrame {
 
     public static JFrame frame;
 
-    public static JButton startQuiz;
-    public static JButton openQuiz;
-    public static JButton addQuiz;
-    public static JButton editQuiz;
-    public static JButton deleteQuiz;
-    public static JButton backButton;
-    public static JButton publishPanel;
-    public static JTable table;
+    static int id;
+    static boolean isDone;
+
+    static JButton viewScores;
+    static JButton back;
 
     private static QuizGroup_Query_Data quiz = new QuizGroup_Query_Data(new dbConnector());
 
@@ -50,14 +48,10 @@ public class ListOfGroupQuizes extends JFrame {
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 15));
         buttonPanel.setOpaque(false);
 
-        startQuiz = createButton("Start Quiz");
-        openQuiz = createButton("Open Quiz");
-        addQuiz = createButton("Add Quiz");
-        editQuiz = createButton("Edit Quiz");
-        deleteQuiz = createButton("Delete Quiz");
-        backButton = createButton("Back");
-
-        hideButton(buttonPanel);
+        viewScores = createButton("Open");
+        back = createButton("Back");
+        buttonPanel.add(viewScores);
+        buttonPanel.add(back);
 
         JPanel header = new JPanel(new BorderLayout());
         header.setOpaque(false);
@@ -65,10 +59,10 @@ public class ListOfGroupQuizes extends JFrame {
         header.add(buttonPanel, BorderLayout.SOUTH);
 
         // ================= TABLE =================
-        String[] columns = {"No.", "#", "Quiz Questions", "Teachers", "Publish"};
+        String[] columns = {"No.", "#", "Quiz Questions", "Teachers"};
         model = new DefaultTableModel(columns, 0);
 
-        table = new JTable(model);
+        JTable table = new JTable(model);
         table.setRowHeight(55);
         table.setFont(new Font("Segoe UI", Font.PLAIN, 18));
         table.setBackground(Color.WHITE);
@@ -92,6 +86,7 @@ public class ListOfGroupQuizes extends JFrame {
                 int row = table.getSelectedRow();
                 if (row != -1) {
                     id = (int) table.getModel().getValueAt(row, 0);
+//                    System.out.println(table.getModel().getValueAt(row, 0));
                 }
             }
         });
@@ -99,12 +94,6 @@ public class ListOfGroupQuizes extends JFrame {
         // ================= BOTTOM PANEL (PUBLISH ONLY FOR TEACHER) =================
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 20, 15));
         bottomPanel.setOpaque(false);
-
-        publishPanel = createButton("Publish");
-
-        if ("Teacher".equals(Globals.getInstance().getRoles().trim())) {
-            bottomPanel.add(publishPanel);
-        }
 
         // ================= ADD COMPONENTS =================
         panel.add(header, BorderLayout.NORTH);
@@ -118,13 +107,8 @@ public class ListOfGroupQuizes extends JFrame {
     private static void AddRowData(DefaultTableModel model) {
 
         if (Globals.getInstance().getRoles().equals("Student")) {
-            System.out.println(Globals.getInstance().getStudentID());
-            quiz.setStudentID(Globals.getInstance().getStudentID());
+            quiz.setTeacherID(Globals.getInstance().getStudentID());
             quiz.setRoles("Student");
-
-            table.getColumnModel().getColumn(4).setMinWidth(0);
-            table.getColumnModel().getColumn(4).setMaxWidth(0);
-            table.getColumnModel().getColumn(4).setWidth(0);
         } else if (Globals.getInstance().getRoles().equals("Teacher")) {
             quiz.setTeacherID(Globals.getInstance().getTeacherID());
             quiz.setRoles("Teacher");
@@ -135,24 +119,22 @@ public class ListOfGroupQuizes extends JFrame {
         Set<Integer> displayedQuizIDs = new HashSet<>();
 
         try {
+            
             while (quizList.next()) {
-
-                int quizGroupID = quizList.getInt("quizGroupID");
-
-                // Skip duplicate quizGroupID
-                if (displayedQuizIDs.contains(quizGroupID)) {
-                    continue;
-                }
-
-                displayedQuizIDs.add(quizGroupID);
-
                 counter++;
+            int quizGroupID = quizList.getInt("quizGroupID");
+
+            // Skip duplicate quizGroupID
+            if (displayedQuizIDs.contains(quizGroupID)) {
+                continue;
+            }
+
+            displayedQuizIDs.add(quizGroupID);
                 model.addRow(new Object[]{
                     quizList.getInt("quizGroupID"),
                     counter,
                     quizList.getString("quizName"),
-                    quizList.getString("fullname"),
-                    (quizList.getInt("published") == 1) ? "published" : "not published"
+                    quizList.getString("fullname")
                 });
             }
         } catch (SQLException ex) {
@@ -163,23 +145,6 @@ public class ListOfGroupQuizes extends JFrame {
     private static void refreshTable() {
         model.setRowCount(0);
         AddRowData(model);
-    }
-
-    // ================= ROLE BUTTONS =================
-    public static void hideButton(JPanel buttonPanel) {
-
-        String role = Globals.getInstance().getRoles().trim();
-
-        if ("Student".equals(role)) {
-            buttonPanel.add(startQuiz);
-        } else if ("Teacher".equals(role)) {
-            buttonPanel.add(openQuiz);
-            buttonPanel.add(addQuiz);
-            buttonPanel.add(editQuiz);
-            buttonPanel.add(deleteQuiz);
-        }
-
-        buttonPanel.add(backButton);
     }
 
     // ================= BUTTON FACTORY =================
@@ -202,61 +167,12 @@ public class ListOfGroupQuizes extends JFrame {
 
             switch (text) {
 
-                case "Open Quiz" -> {
+                case "Open" -> {
+
                     Globals.getInstance().setQuizGroupID(id);
-                    new ListOfQuizes().setVisible(true);
+                    finishedQuiz finished = new finishedQuiz();
+                    finished.setVisible(true);
                     frame.setVisible(false);
-                }
-
-                case "Start Quiz" -> {
-                    Globals.getInstance().setQuizGroupID(id);
-                    new appQuiz().setVisible(true);
-                    frame.setVisible(false);
-                }
-
-                case "Add Quiz" -> {
-                    new AddQuizGroup().setVisible(true);
-                    frame.setVisible(false);
-                }
-
-                case "Edit Quiz" -> {
-                    Globals.getInstance().setQueryMode("edit");
-                    Globals.getInstance().setQuizGroupID(id);
-                    new AddQuizGroup().setVisible(true);
-                    frame.setVisible(false);
-                }
-
-                case "Publish" -> {
-                    int choice = JOptionPane.showConfirmDialog(
-                            null,
-                            "Are you sure to want to publish this?",
-                            "Confirm",
-                            JOptionPane.YES_NO_OPTION
-                    );
-
-                    if (choice == JOptionPane.YES_OPTION) {
-                        quiz.setQuizGroupID(id);
-                        quiz.publish();
-                        JOptionPane.showMessageDialog(frame, "Publish quiz successfully");
-                    }
-                    refreshTable();
-                }
-
-                case "Delete Quiz" -> {
-                    int choice = JOptionPane.showConfirmDialog(
-                            null,
-                            "Delete this quiz?",
-                            "Confirm",
-                            JOptionPane.YES_NO_OPTION
-                    );
-
-                    if (choice == JOptionPane.YES_OPTION) {
-                        quiz.setQuizGroupID(id);
-                        quiz.deleteQuizGroup();
-                        JOptionPane.showMessageDialog(frame, "Deleted successfully");
-
-                        refreshTable();
-                    }
                 }
 
                 case "Back" -> {
