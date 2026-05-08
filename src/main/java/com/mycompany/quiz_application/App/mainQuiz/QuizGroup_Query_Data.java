@@ -117,7 +117,7 @@ public class QuizGroup_Query_Data {
             
                 s.studentID,
                 q.published,
-                
+                q.hasTime, q.timestamp,
             
                 -- If no progress record, display Not Done
                 COALESCE(p.status, 'Not Done') AS quizStatus
@@ -143,7 +143,6 @@ public class QuizGroup_Query_Data {
             LEFT JOIN progress p
                 ON p.studentID = s.studentID
                 AND p.quizGroupID = q.quizGroupID
-            WHERE q.published = 1
             %s
             ORDER BY q.quizName, studentName;
             """;
@@ -153,7 +152,9 @@ public class QuizGroup_Query_Data {
 
         if ("Student".equals(roles)) {
             extraQuery = """
-                AND p.status IS  NULL
+                
+                WHERE q.published = 1
+                AND (p.status IS  NULL OR p.status = "saved")
                 AND s.studentID = ?
                 """;
             params = new Object[]{studentID};
@@ -161,7 +162,7 @@ public class QuizGroup_Query_Data {
 
         } else if ("Teacher".equals(roles)) {
             extraQuery = """
-                AND t.teacherID = ?
+                WHERE t.teacherID = ?
                 """;
             params = new Object[]{teacherID};
 

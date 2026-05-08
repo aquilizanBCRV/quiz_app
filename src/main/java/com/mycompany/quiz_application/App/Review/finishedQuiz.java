@@ -15,6 +15,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
@@ -29,6 +30,9 @@ public class finishedQuiz extends javax.swing.JFrame {
 
     public static int id = 0;
     public static boolean isDone = false;
+
+    public static int quizID = 0;
+    public static ArrayList<Integer> quizGroup = new ArrayList<>();
 
     /**
      * Creates new form finishedQuiz
@@ -142,13 +146,19 @@ public class finishedQuiz extends javax.swing.JFrame {
             return;
         }
         isDone = false;
-        
+
         ReviewQuiz result = new ReviewQuiz();
-        Globals.getInstance().setQuizGroupID( Globals.getInstance().getQuizGroupID());
+        if (Globals.getInstance().getRoles().equals("Student")) {
+            Globals.getInstance().setQuizGroupID(quizID);
+        }; // its still the value from the previos selection
+
+//        Globals.getInstance().setQuizGroupID(Globals.getInstance().getQuizGroupID() || quizID);
         Globals.getInstance().setStudentID(id);
         setVisible(false);
         result.displayData();
         result.setVisible(true);
+        quizID = 0; //why didnt reset
+
     }//GEN-LAST:event_ReviewActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
@@ -157,18 +167,21 @@ public class finishedQuiz extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "Selected row required !");
             return;
         }
-         if (Globals.getInstance().getRoles().equals("Teacher") && !isDone) {
+        if (Globals.getInstance().getRoles().equals("Teacher") && !isDone) {
             JOptionPane.showMessageDialog(this, "No records Found !");
             return;
         }
         QuizResult result = new QuizResult();
-        Globals.getInstance().setQuizGroupID( Globals.getInstance().getQuizGroupID());
+        if (Globals.getInstance().getRoles().equals("Student")) {
+            Globals.getInstance().setQuizGroupID(quizID);
+        }
         Globals.getInstance().setStudentID(id);
         setVisible(false);
         result.showResult();
         result.setVisible(true);
+        quizID = 0; //why didnt reset
 
-        id = 0;
+
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
@@ -191,6 +204,7 @@ public class finishedQuiz extends javax.swing.JFrame {
         DefaultTableModel model = (DefaultTableModel) table.getModel();
         model.setRowCount(0); // clear previous data
 
+        quizGroup.clear();
         try {
             ResultSet list;
 
@@ -232,12 +246,12 @@ public class finishedQuiz extends javax.swing.JFrame {
                         list.getInt("studentID"),
                         list.getString("quizName"),
                         list.getString("fullname"),
-                        
                         "done".equals(list.getString("status")) ? "done" : "not finished"
                     });
-                }
 
-//                table.getColumnModel().getColumn(3).setHeaderValue("Full Name");
+                    quizGroup.add(list.getInt("quizGroupID"));
+                }
+//                       table.getColumnModel().getColumn(3).setHeaderValue("Full Name");
 //                table.getTableHeader().repaint();
             }
 
@@ -262,7 +276,12 @@ public class finishedQuiz extends javax.swing.JFrame {
                         isDone = (isFInish.equals("done")) ? true : false;
                     }
                     id = (int) secondColumnValue;
-                    System.out.println("Selected Row: " + modelRow);
+
+                    if (modelRow < quizGroup.size()) {
+                        quizID = quizGroup.get(modelRow);
+                    }
+
+                    System.out.println("Selected Row: " + quizID);
                     System.out.println("2nd Column Value: " + secondColumnValue);
                 }
             }

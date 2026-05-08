@@ -149,7 +149,9 @@ public class ReviewQuiz extends javax.swing.JFrame {
 
                 if (list.getInt("quizType") == 2) {
                     quizAnswer = list.getInt("quizAnswer") != 1 ? "True" : "False";
-                    studentAnswerx = list.getInt("studentAnswer") != 1 ? "True" : "False";
+                    studentAnswerx = (list.getObject("studentAnswer", Integer.class) == null)
+                            ? "No Answer"
+                            : (list.getInt("studentAnswer") == 1 ? "True" : "False");
                 } else if (list.getInt("quizType") == 1) {
                     String[] cityArray = list.getString("questionList").split(",");
 
