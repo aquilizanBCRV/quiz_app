@@ -33,13 +33,14 @@ public class QuizResult extends javax.swing.JFrame {
         try {
             log.setquizGroupID(Globals.getInstance().getQuizGroupID());
             log.setStudentID(Globals.getInstance().getStudentID());
-            
+
             ResultSet quizList = log.displayResult();
 
             while (quizList.next()) {
                 System.out.println(quizList.getInt("quizID"));
-                if (quizList.getInt("studentAnswer") == quizList.getInt("quizAnswer")) {
-                resultNumber ++;
+                if (!quizList.wasNull()
+                        && (quizList.getInt("studentAnswer") == quizList.getInt("quizAnswer"))) {
+                    resultNumber++;
                 }
                 totalNumber++;
             }
@@ -152,7 +153,7 @@ public class QuizResult extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-       
+
         finishedQuiz group = new finishedQuiz();
         setVisible(false);
         group.setVisible(true);

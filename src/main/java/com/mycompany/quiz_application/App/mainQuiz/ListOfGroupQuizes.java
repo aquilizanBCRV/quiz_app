@@ -12,6 +12,8 @@ import javax.swing.table.JTableHeader;
 import java.awt.*;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -33,6 +35,10 @@ public class ListOfGroupQuizes extends JFrame {
     public static JButton backButton;
     public static JButton publishPanel;
     public static JTable table;
+
+    public static ArrayList<Boolean> hasTimer = new ArrayList<>();
+    public static ArrayList<Integer> setTimer = new ArrayList<>();
+    public static int row;
 
     private static QuizGroup_Query_Data quiz = new QuizGroup_Query_Data(new dbConnector());
 
@@ -89,7 +95,7 @@ public class ListOfGroupQuizes extends JFrame {
 
         table.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                int row = table.getSelectedRow();
+                row = table.getSelectedRow();
                 if (row != -1) {
                     id = (int) table.getModel().getValueAt(row, 0);
                 }
@@ -117,6 +123,8 @@ public class ListOfGroupQuizes extends JFrame {
     // ================= TABLE DATA =================
     private static void AddRowData(DefaultTableModel model) {
 
+        hasTimer.clear();
+        setTimer.clear();
         if (Globals.getInstance().getRoles().equals("Student")) {
             System.out.println(Globals.getInstance().getStudentID());
             quiz.setStudentID(Globals.getInstance().getStudentID());
@@ -154,6 +162,8 @@ public class ListOfGroupQuizes extends JFrame {
                     quizList.getString("fullname"),
                     (quizList.getInt("published") == 1) ? "published" : "not published"
                 });
+                hasTimer.add(quizList.getInt("hasTime") == 1);
+                setTimer.add((Integer) (quizList.getInt("timestamp") * 60 * 60));
             }
         } catch (SQLException ex) {
             ex.printStackTrace();
@@ -162,6 +172,10 @@ public class ListOfGroupQuizes extends JFrame {
 
     private static void refreshTable() {
         model.setRowCount(0);
+
+        hasTimer.clear();
+        setTimer.clear();
+
         AddRowData(model);
     }
 
@@ -209,7 +223,10 @@ public class ListOfGroupQuizes extends JFrame {
                 }
 
                 case "Start Quiz" -> {
+                    //Why this code when i click the rows that no timer, i can rn the code. but when i click new row after i done take, quiz, it cant start the timer unless I restart to a new app
                     Globals.getInstance().setQuizGroupID(id);
+                    Globals.getInstance().setSetTime(hasTimer.get(row));
+                    Globals.getInstance().setSetTimer(setTimer.get(row));
                     new appQuiz().setVisible(true);
                     frame.setVisible(false);
                 }

@@ -34,6 +34,7 @@ public class appQuiz extends javax.swing.JFrame {
 //    static Globals global = new Globals(); 
     static dbConnector conn = new dbConnector();
     static QuizLog_Query_Data log = new QuizLog_Query_Data(conn);
+
     private Timer timer;
     private int counter = 0;
     private int totalQuizes = 0;
@@ -84,20 +85,38 @@ public class appQuiz extends javax.swing.JFrame {
 
             if (savedProgress != null && savedProgress.next()) {
                 System.out.println("Progessed Detected");
+                //fix this code, that when detect a ne wprogress, it will load the a current timer
+
                 // Has at least one row
                 int setPage = savedProgress.getInt("quizCounter");
-                Time setTime = savedProgress.getTime("currentTimestamp");
-                int minute = setTime.toLocalTime().getMinute();
 
+                if (Globals.getInstance().isSetTime()) {
+
+                    Time setTime = savedProgress.getTime("currentTimestamp");
+
+                    if (setTime != null) {
+
+                        LocalTime savedTime = setTime.toLocalTime();
+
+                        counter
+                                = savedTime.getHour() * 3600
+                                + savedTime.getMinute() * 60
+                                + savedTime.getSecond();
+
+                        labelTimer.setText(
+                                String.format(
+                                        "%02d:%02d:%02d",
+                                        savedTime.getHour(),
+                                        savedTime.getMinute(),
+                                        savedTime.getSecond()
+                                )
+                        );
+                    }
+                }
                 labelDisplayQuiz.setText(quizQuestions.get(setPage));
                 displayAnswerList(setPage);
                 currentIndex = setPage;
-                LocalTime savedTime = setTime.toLocalTime();
 
-                counter
-                        = savedTime.getHour() * 3600
-                        + savedTime.getMinute() * 60
-                        + savedTime.getSecond();
                 getCounter();
 
             } else {
@@ -130,30 +149,49 @@ public class appQuiz extends javax.swing.JFrame {
             timer.stop();
         }
 
-        // Reset counter
-        // Create new timer
+        //but its return to original even though its detect a saved progress
+        if (!Globals.getInstance().isSetTime()) {
+            jPanel4.setVisible(false);
+            return;
+        }
+        jPanel4.setVisible(true);
+        counter = Globals.getInstance().getSetTimer();
+        System.out.println("Timer" + counter);
         timer = new Timer(1000, new ActionListener() { // 1000ms = 1 second
             @Override
             public void actionPerformed(ActionEvent e) {
-                counter++;
 
-                int minutes = counter / 60;
-                int seconds = counter % 60;
+                if (counter > 0) {
+                    counter--;
 
-                labelTimer.setText(String.format("%02d:%02d", minutes, seconds));
+                    int hrs = counter / 3600;
+                    int minutes = (counter % 3600) / 60;
+                    int seconds = counter % 60;
+
+                    labelTimer.setText(
+                            String.format("%02d:%02d:%02d", hrs, minutes, seconds)
+                    );
+                } else {
+
+                    timer.stop();
+
+                    JOptionPane.showMessageDialog(
+                            appQuiz.this,
+                            "Time is up!",
+                            "Quiz Timer",
+                            JOptionPane.WARNING_MESSAGE
+                    );
+
+                    saveProgress("done");
+
+                    QuizResult qr = new QuizResult();
+                    qr.showResult();
+
+                    setVisible(false);
+                    qr.setVisible(true);
+                }
             }
         });
-
-        timer.start();
-    }
-
-    private void restartTimer() {
-        if (timer != null) {
-            timer.stop();
-        }
-
-        counter = 0;
-        labelTimer.setText("00:00");
         timer.start();
     }
 
@@ -177,7 +215,8 @@ public class appQuiz extends javax.swing.JFrame {
                     buttonGroup2.getSelection().getActionCommand()
             );
         }
-        log.setTimestamp(LocalTime.of(0, 0, counter));
+
+        log.setTimestamp(LocalTime.ofSecondOfDay(counter));
         log.createQuiz();
         saveProgress("undone");
     }
@@ -186,7 +225,7 @@ public class appQuiz extends javax.swing.JFrame {
         log.setStudentID(Globals.getInstance().getStudentID());
         log.setquizGroupID(Globals.getInstance().getQuizGroupID());
         log.setCounter(currentIndex);
-        log.setTimestamp(LocalTime.of(0, 0, counter));
+        log.setTimestamp(LocalTime.ofSecondOfDay(counter));
         log.setStatus(status);
         log.saveProgress();
     }
@@ -528,10 +567,11 @@ public class appQuiz extends javax.swing.JFrame {
             labelDisplayQuiz.setText(quizQuestions.get(currentIndex));
             displayAnswerList(currentIndex);
             getCounter();
-            restartTimer();
         } else {
-            timer.stop();
-            labelTimer.setText("00:00");
+
+            if (Globals.getInstance().isSetTime()) {
+                timer.stop();
+            }
             JOptionPane.showMessageDialog(this, "You finish the quizes. You will redirect to the result...");
             QuizResult qr = new QuizResult();
             qr.showResult();

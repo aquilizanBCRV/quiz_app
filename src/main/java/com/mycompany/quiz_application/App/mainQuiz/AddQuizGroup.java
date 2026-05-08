@@ -61,7 +61,7 @@ public class AddQuizGroup {
 
         panel.add(Box.createVerticalStrut(10));
 
-        setTextTimer = createLabel("Set Time(minutes)");
+        setTextTimer = createLabel("Set Time(hours)");
         setTextTimer.setVisible(false);
         panel.add(setTextTimer);
         timerField = createInput();

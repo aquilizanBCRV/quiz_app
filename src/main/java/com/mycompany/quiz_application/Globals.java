@@ -7,8 +7,25 @@ public class Globals {
     private int studentID = 0;
     private int teacherID = 0;
     private int userID = 0;
+    private boolean setTime;
+    private int setTimer;
+    private boolean manageAccount;
 
-    private boolean  manageAccount;
+    public boolean isSetTime() {
+        return setTime;
+    }
+
+    public void setSetTime(boolean setTime) {
+        this.setTime = setTime;
+    }
+
+    public int getSetTimer() {
+        return setTimer;
+    }
+
+    public void setSetTimer(int setTimer) {
+        this.setTimer = setTimer;
+    }
 
     public boolean isManageAccount() {
         return manageAccount;
@@ -17,6 +34,7 @@ public class Globals {
     public void setManageAccount(boolean manageAccount) {
         this.manageAccount = manageAccount;
     }
+
     public int getUserID() {
         return userID;
     }

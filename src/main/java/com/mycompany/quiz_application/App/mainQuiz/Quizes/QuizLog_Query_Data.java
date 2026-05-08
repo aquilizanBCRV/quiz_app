@@ -165,19 +165,20 @@ public class QuizLog_Query_Data extends Quiz_Query_Data {
 
     public ResultSet displayResult() {
         String selectQuery = """
-       SELECT * FROM quiz_application.answerLog 
-       inner join quizes 
-       ON quizes.quizesID = answerLog.quizID
-        WHERE quizes.quizGroupID = ?
-        AND answerLog.studentID = ?
+     SELECT *
+       FROM quizes
+       LEFT JOIN answerLog
+           ON quizes.quizesID = answerLog.quizID
+           AND answerLog.studentID = ?
+       WHERE quizes.quizGroupID = ?
                              ;
         """;
 
         try {
             myconn.connect();
             PreparedStatement prep = myconn.con.prepareStatement(selectQuery);
-            prep.setInt(1, quizGroupID);
-            prep.setInt(2, studentID);
+            prep.setInt(1, studentID);
+            prep.setInt(2, quizGroupID);
             ResultSet rs = prep.executeQuery();
             return rs;
 

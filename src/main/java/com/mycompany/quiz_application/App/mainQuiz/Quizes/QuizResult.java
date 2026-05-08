@@ -14,41 +14,44 @@ import java.sql.ResultSet;
  * @author yuzuki
  */
 public class QuizResult extends javax.swing.JFrame {
-
+    
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(QuizResult.class.getName());
-
+    
     static QuizLog_Query_Data log = new QuizLog_Query_Data(new dbConnector());
-
+    
     public void setStudentID(int studentID) {
         this.studentID = studentID;
     }
-
+    
     public void setQuizGroupID(int quizGroupID) {
         this.quizGroupID = quizGroupID;
     }
-
+    
     private int studentID;
     private int quizGroupID;
+
     /**
      * Creates new form QuizResult
      */
     public QuizResult() {
-        initComponents();
+        initComponents();showResult();
     }
-
+    
     public void showResult() {
         int totalNumber = 0;
         int resultNumber = 0;
         try {
-            System.out.println(studentID+" "+quizGroupID);
+         
             log.setquizGroupID(  Globals.getInstance().getQuizGroupID());
             log.setStudentID( Globals.getInstance().getStudentID());
             ResultSet quizList = log.displayResult();
-
+            
             while (quizList.next()) {
                 System.out.println(quizList.getInt("quizID"));
-                if (quizList.getInt("studentAnswer") == quizList.getInt("quizAnswer")) {
-                resultNumber ++;
+                if (
+                        !quizList.wasNull() &&
+                        (quizList.getInt("studentAnswer") == quizList.getInt("quizAnswer"))) {
+                    resultNumber++;
                 }
                 totalNumber++;
             }
@@ -161,7 +164,7 @@ public class QuizResult extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-       
+        
         ListOfGroupQuizes group = new ListOfGroupQuizes();
         setVisible(false);
         group.setWindow(true);

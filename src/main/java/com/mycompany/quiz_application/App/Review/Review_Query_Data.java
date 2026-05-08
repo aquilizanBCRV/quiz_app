@@ -56,13 +56,19 @@ public class Review_Query_Data {
     }
 
     public ResultSet displayReview() {
+        System.out.println(studentID+""+quizGroupID);
         return myconn.readQuery("""
-          SELECT * FROM quiz_application.answerLog 
-          inner join quizes 
-          ON quizes.quizesID = answerLog.quizID
-          WHERE quizes.quizGroupID = ?
-          AND answerLog.studentID = ?
-        """, new Object[]{quizGroupID, studentID});
+        SELECT 
+          	*,-- adjust column name as needed
+              COALESCE(a.studentAnswer, 'Not Answered') AS studentAnswer,
+              CASE WHEN a.logID IS NULL THEN 'Unanswered' ELSE 'Answered' END AS status
+          FROM quiz_application.quizes q
+          LEFT JOIN quiz_application.answerLog a 
+                 ON q.quizesID = a.quizID 
+                AND a.studentID = ?
+          WHERE q.quizGroupID = ?
+          ORDER BY status, q.quizesID;
+        """, new Object[]{studentID,quizGroupID});
     }
 
     public ResultSet displayQuiz() {
